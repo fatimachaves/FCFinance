@@ -1,0 +1,6 @@
+@FCFinance_HostAddress = http://localhost:5286
+
+GET {{FCFinance_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
