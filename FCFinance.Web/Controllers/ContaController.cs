@@ -3,6 +3,7 @@ using FCFinance.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace FCFinance.Web.Controllers
 {
@@ -27,10 +28,11 @@ namespace FCFinance.Web.Controllers
             return View(new LoginViewModel { ReturnUrl = returnUrl });
         }
 
-        // POST /Conta/Login
+        // POST /Conta/Login  (máx. 10 tentativas por minuto por IP)
         [AllowAnonymous]
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [EnableRateLimiting(SecurityHeaders.LoginPolicy)]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
             if (!ModelState.IsValid) return View(model);
@@ -67,9 +69,10 @@ namespace FCFinance.Web.Controllers
         [HttpGet]
         public IActionResult AlterarSenha() => View(new AlterarSenhaViewModel());
 
-        // POST /Conta/AlterarSenha
+        // POST /Conta/AlterarSenha  (máx. 10 tentativas por minuto por IP: evita adivinhar a senha atual)
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [EnableRateLimiting(SecurityHeaders.LoginPolicy)]
         public async Task<IActionResult> AlterarSenha(AlterarSenhaViewModel model)
         {
             if (!ModelState.IsValid) return View(model);

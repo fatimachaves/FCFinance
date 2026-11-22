@@ -74,7 +74,7 @@
           @if (u.Id != meuId)
           {
             <form asp-action="Excluir" asp-route-id="@u.Id" method="post" class="inline-form"
-                  onsubmit="return confirm('Excluir o usuário @u.Login? Os lançamentos, metas e categorias dele também serão apagados. Essa ação não pode ser desfeita.');">
+                  data-confirm="Excluir o usuário @u.Login? Os lançamentos, metas e categorias dele também serão apagados. Essa ação não pode ser desfeita.">
               <button type="submit" class="icon-btn danger" title="Excluir" aria-label="Excluir @u.Login">✕</button>
             </form>
           }
@@ -86,11 +86,6 @@
 
 @section Styles {
     <link rel="stylesheet" href="~/css/transacoes.css" asp-append-version="true" />
-    <style>
-      .perfil-opt input{position:absolute;opacity:0;width:0;height:0}
-      .perfil-opt:has(input:checked){background:linear-gradient(180deg,#0f6a3e,#0b4d30);border-color:#18c473;box-shadow:0 0 18px #19d77b44}
-      .perfil-opt:has(input:focus-visible){outline:2px solid #52ee9b;outline-offset:2px}
-    </style>
 }
 @section Scripts {
     <script src="~/js/auth.js" asp-append-version="true"></script>

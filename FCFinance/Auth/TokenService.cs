@@ -27,7 +27,9 @@ namespace FCFinance.Auth
             {
                 new("sub", user.Id),
                 new("name", user.UserName ?? ""),
-                new("nome", string.IsNullOrWhiteSpace(user.Nome) ? user.UserName ?? "" : user.Nome)
+                new("nome", string.IsNullOrWhiteSpace(user.Nome) ? user.UserName ?? "" : user.Nome),
+                // Carimbo de segurança: permite cancelar o token (ver ApiTokenValidator).
+                new(ApiTokenValidator.SecurityStampClaim, user.SecurityStamp ?? "")
             };
             claims.AddRange(perfis.Select(p => new Claim("role", p)));
 

@@ -3,6 +3,7 @@ using FCFinance.DTO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace FCFinance.Controllers
 {
@@ -25,6 +26,7 @@ namespace FCFinance.Controllers
         // POST api/Auth/login  { "login": "admin", "senha": "...", "manterConectado": true }
         [AllowAnonymous]
         [HttpPost("login")]
+        [EnableRateLimiting(ApiSecurity.LoginPolicy)] // máx. 10 tentativas por minuto por IP
         public async Task<IActionResult> Login(LoginDTO dto)
         {
             var user = await _users.FindByNameAsync(dto.Login.Trim());
@@ -34,6 +36,10 @@ namespace FCFinance.Controllers
             var result = await _signIn.CheckPasswordSignInAsync(user, dto.Senha, lockoutOnFailure: true);
             if (result.IsLockedOut) return Unauthorized("Muitas tentativas erradas. Aguarde alguns minutos e tente de novo.");
             if (!result.Succeeded) return Unauthorized("Usuário ou senha inválidos.");
+
+            // Todo token precisa do carimbo de segurança (usuários antigos podem não ter um).
+            if (string.IsNullOrEmpty(user.SecurityStamp))
+                await _users.UpdateSecurityStampAsync(user);
 
             var perfis = await _users.GetRolesAsync(user);
             var (token, expira) = _tokens.Criar(user, perfis,
@@ -52,7 +58,10 @@ namespace FCFinance.Controllers
         }
 
         // POST api/Auth/alterar-senha
+        // Trocar a senha muda o carimbo de segurança: TODOS os tokens antigos deixam de valer
+        // (inclusive o desta chamada e os de outros aparelhos). Por isso a resposta traz um token novo.
         [HttpPost("alterar-senha")]
+        [EnableRateLimiting(ApiSecurity.LoginPolicy)] // evita adivinhar a senha atual
         public async Task<IActionResult> AlterarSenha(AlterarSenhaDTO dto)
         {
             var user = await _users.GetUserAsync(User);
@@ -60,7 +69,10 @@ namespace FCFinance.Controllers
 
             var result = await _users.ChangePasswordAsync(user, dto.SenhaAtual, dto.NovaSenha);
             if (!result.Succeeded) return BadRequest(Erros.Traduzir(result));
-            return NoContent();
+
+            var perfis = await _users.GetRolesAsync(user);
+            var (token, expira) = _tokens.Criar(user, perfis, TimeSpan.FromHours(12));
+            return Ok(new LoginRespostaDTO { Token = token, ExpiraEm = expira, Usuario = ParaDTO(user, perfis) });
         }
 
         internal static UsuarioDTO ParaDTO(AppUser u, IList<string> perfis) => new()

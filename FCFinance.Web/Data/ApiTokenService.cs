@@ -11,8 +11,13 @@ namespace FCFinance.Web.Data
     public class ApiTokenService
     {
         private readonly IConfiguration _config;
+        private readonly string _securityStampClaim;
 
-        public ApiTokenService(IConfiguration config) => _config = config;
+        public ApiTokenService(IConfiguration config, Microsoft.Extensions.Options.IOptions<Microsoft.AspNetCore.Identity.IdentityOptions> identity)
+        {
+            _config = config;
+            _securityStampClaim = identity.Value.ClaimsIdentity.SecurityStampClaimType;
+        }
 
         public string? CriarPara(ClaimsPrincipal user)
         {
@@ -23,7 +28,10 @@ namespace FCFinance.Web.Data
             {
                 new("sub", user.FindFirstValue(ClaimTypes.NameIdentifier) ?? ""),
                 new("name", user.Identity.Name ?? ""),
-                new("nome", user.Nome())
+                new("nome", user.Nome()),
+                // Carimbo de segurança do login (o Identity guarda no cookie). A API confere se ainda é o
+                // atual: se a senha mudou ou o usuário foi excluído, o token é recusado.
+                new("sstamp", user.FindFirstValue(_securityStampClaim) ?? "")
             };
             claims.AddRange(user.FindAll(ClaimTypes.Role).Select(r => new Claim("role", r.Value)));
 

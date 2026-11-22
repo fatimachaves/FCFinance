@@ -101,7 +101,22 @@ builder.Services
             RoleClaimType = "role",
             ClockSkew = TimeSpan.FromMinutes(1)
         };
+        // Depois de conferir a assinatura do token, confere no banco se ele ainda deve valer
+        // (senha trocada, usuário excluído, perfil retirado). Ver Auth/ApiTokenValidator.cs.
+        options.Events = new JwtBearerEvents
+        {
+            OnTokenValidated = async context =>
+            {
+                var validator = context.HttpContext.RequestServices.GetRequiredService<ApiTokenValidator>();
+                var error = await validator.ValidateAsync(context.Principal!);
+                if (error != null) context.Fail(error);
+            }
+        };
     });
+builder.Services.AddScoped<ApiTokenValidator>();
+
+// Limite de requisições (login por IP + limite geral por usuário). Ver Auth/ApiSecurity.cs.
+builder.Services.AddApiRateLimits();
 
 // Origens liberadas no CORS vêm do appsettings (seção "Cors:Origins").
 var corsOrigins = builder.Configuration.GetSection("Cors:Origins").Get<string[]>() ?? [];
@@ -128,12 +143,18 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+else
+{
+    app.UseHsts(); // navegador passa a usar só HTTPS com a API
+}
 
 app.UseHttpsRedirection();
+app.UseApiSecurityHeaders();
 
 // A ordem importa: CORS antes do login, para o navegador conseguir fazer a "pré-consulta" (OPTIONS).
 app.UseCors("WebFCFinance");
-app.UseAuthentication(); // lê o token
+app.UseAuthentication(); // lê o token (e confere o carimbo de segurança)
+app.UseRateLimiter();    // depois do login: o limite geral é por usuário
 app.UseAuthorization();  // decide se pode acessar
 
 app.MapControllers();

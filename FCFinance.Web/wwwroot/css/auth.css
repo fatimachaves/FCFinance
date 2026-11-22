@@ -54,3 +54,8 @@
 .form-grid>*{min-width:0} /* impede o campo de "vazar" para fora da coluna */
 
 @media(max-width:850px){.auth-shell,.account-grid{grid-template-columns:1fr}.auth-promo{display:none}.user-name{display:none}}
+
+/* Tela Usuários: escolha do perfil (Usuário / Admin) */
+.perfil-opt input{position:absolute;opacity:0;width:0;height:0}
+.perfil-opt:has(input:checked){background:linear-gradient(180deg,#0f6a3e,#0b4d30);border-color:#18c473;box-shadow:0 0 18px #19d77b44}
+.perfil-opt:has(input:focus-visible){outline:2px solid #52ee9b;outline-offset:2px}
