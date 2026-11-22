@@ -48,6 +48,34 @@ namespace FCFinance.Models
                 .HasIndex(g => new { g.UserId, g.IsPriority })
                 .IsUnique()
                 .HasFilter("[IsPriority] = 1");
+
+            // ---------- Bot do WhatsApp ----------
+            modelBuilder.Entity<WhatsAppLink>(e =>
+            {
+                e.Property(x => x.PhoneNumber).HasMaxLength(32);
+                e.Property(x => x.UserId).HasMaxLength(450);
+                e.HasIndex(x => x.PhoneNumber).IsUnique(); // um telefone = uma conta
+                e.HasIndex(x => x.UserId).IsUnique();      // uma conta = um telefone
+            });
+            modelBuilder.Entity<WhatsAppLinkCode>(e =>
+            {
+                e.Property(x => x.Code).HasMaxLength(6);
+                e.Property(x => x.UserId).HasMaxLength(450);
+                e.HasIndex(x => x.Code).IsUnique();
+                e.HasIndex(x => x.UserId);
+            });
+            modelBuilder.Entity<ChatSession>(e =>
+            {
+                e.HasKey(x => x.PhoneNumber);
+                e.Property(x => x.PhoneNumber).HasMaxLength(64); // telefone, ou "sim:" + UserId (GUID) no simulador
+                e.Property(x => x.Amount).HasPrecision(18, 2);
+            });
+            modelBuilder.Entity<ProcessedChatMessage>(e =>
+            {
+                e.HasKey(x => x.MessageId);
+                e.Property(x => x.MessageId).HasMaxLength(200);
+                e.HasIndex(x => x.ReceivedAt);
+            });
         }
 
         public DbSet<Category> Categories => Set<Category>();
@@ -55,5 +83,10 @@ namespace FCFinance.Models
 
         public DbSet<ValueType> ValueTypes => Set<ValueType>();
         public DbSet<Goal> Goals => Set<Goal>();
+
+        public DbSet<WhatsAppLink> WhatsAppLinks => Set<WhatsAppLink>();
+        public DbSet<WhatsAppLinkCode> WhatsAppLinkCodes => Set<WhatsAppLinkCode>();
+        public DbSet<ChatSession> ChatSessions => Set<ChatSession>();
+        public DbSet<ProcessedChatMessage> ProcessedChatMessages => Set<ProcessedChatMessage>();
     }
 }

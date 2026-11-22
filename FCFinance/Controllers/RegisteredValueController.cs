@@ -2,6 +2,7 @@
 using FCFinance.Auth;
 using FCFinance.Models;
 using FCFinance.DTO;
+using FCFinance.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,10 +14,12 @@ namespace FCFinance.Controllers
     public class RegisteredValueController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly RegisteredValueService _values;
 
-        public RegisteredValueController(AppDbContext appContext)
+        public RegisteredValueController(AppDbContext appContext, RegisteredValueService values)
         {
             _context = appContext;
+            _values = values;
         }
 
         private IQueryable<RegisteredValue> Mine()
@@ -106,22 +109,8 @@ namespace FCFinance.Controllers
         [HttpPost]
         public async Task<IActionResult> SetRegisteredValue(RegisteredValueDTO registeredValue)
         {
-            var error = await ValidateAsync(registeredValue);
-            if (error != null) return BadRequest(error);
-
-            var newValue = new RegisteredValue()
-            {
-                Name = registeredValue.Name.Trim(),
-                Value = registeredValue.Value,
-                CategoryId = registeredValue.CategoryId,
-                ValueTypeId = registeredValue.ValueTypeId,
-                CreateWhen = registeredValue.CreateWhen,
-                UserId = User.GetUserId()
-            };
-
-            _context.RegisteredValues.Add(newValue);
-
-            await _context.SaveChangesAsync();
+            var (newValue, error) = await _values.CreateAsync(User.GetUserId(), registeredValue);
+            if (newValue == null) return BadRequest(error);
 
             return CreatedAtAction(nameof(GetRegisteredValueById), new { id = newValue.Id }, await LoadResponseAsync(newValue.Id));
         }
@@ -136,7 +125,7 @@ namespace FCFinance.Controllers
             if (existingValue == null)
                 return NotFound("Registro não encontrado.");
 
-            var error = await ValidateAsync(registeredValue);
+            var error = await _values.ValidateAsync(User.GetUserId(), registeredValue);
             if (error != null) return BadRequest(error);
 
             existingValue.Name = registeredValue.Name.Trim();
@@ -164,33 +153,6 @@ namespace FCFinance.Controllers
             await _context.SaveChangesAsync();
 
             return NoContent();
-        }
-
-        // Confere as chaves estrangeiras antes de gravar (sem isso o banco devolve erro 500)
-        // e se o tipo do lançamento é o mesmo da categoria (receita só em categoria de receita).
-        private async Task<string?> ValidateAsync(RegisteredValueDTO dto)
-        {
-            if (dto.Value <= 0)
-                return "Informe um valor maior que zero.";
-
-            var userId = User.GetUserId();
-
-            var category = await _context.Categories
-                .Where(c => c.Id == dto.CategoryId && (c.UserId == null || c.UserId == userId))
-                .Select(c => new { c.TypeId })
-                .SingleOrDefaultAsync();
-            if (category == null)
-                return "Categoria inválida.";
-
-            if (!await _context.ValueTypes.AnyAsync(t => t.Id == dto.ValueTypeId))
-                return "Tipo de lançamento inválido.";
-
-            if (category.TypeId != dto.ValueTypeId)
-                return dto.ValueTypeId == Models.ValueType.Receita
-                    ? "Essa categoria é de despesa. Escolha uma categoria de receita."
-                    : "Essa categoria é de receita. Escolha uma categoria de despesa.";
-
-            return null;
         }
     }
 }

@@ -1,0 +1,82 @@
+@{
+    ViewData["Title"] = "WhatsApp";
+}
+
+<header class="topbar">
+  <div>
+    <h1>WhatsApp 💬</h1>
+    <p>Registre receitas e despesas conversando com o bot do FCFinance.</p>
+  </div>
+  <div class="top-actions">
+    <a class="quick-btn" asp-controller="Home" asp-action="Index" title="Voltar para a tela principal">← Dashboard</a>
+    <partial name="_UserMenu" />
+  </div>
+</header>
+
+<div id="wa-status-msg" class="status-message error hidden"></div>
+
+<section class="tx-grid">
+  @* ===== Conectar o telefone ===== *@
+  <article class="panel tx-form-panel">
+    <div class="tx-title">
+      <span class="tx-title-icon">📱</span>
+      <div><h2>Conectar meu WhatsApp</h2><p>Faça isso uma vez para o bot saber que é você</p></div>
+    </div>
+
+    <div id="wa-loading" class="empty-state">Carregando...</div>
+
+    <div id="wa-connected" class="hidden">
+      <p class="wa-ok">✅ Conectado ao número <b id="wa-phone"></b></p>
+      <p class="hint" id="wa-since"></p>
+      <p>Para registrar, envie o <b>valor</b> para o bot. Ex.: <b>45,90</b>. Ele pergunta o tipo, a categoria e a descrição.</p>
+      <button type="button" class="btn btn-danger" id="wa-unlink">✕ Desconectar este número</button>
+    </div>
+
+    <div id="wa-disconnected" class="hidden">
+      <ol class="wa-steps">
+        <li>Clique em <b>Gerar código</b>.</li>
+        <li>No seu celular, abra a conversa com o <b>número do bot</b> no WhatsApp.</li>
+        <li>Envie o código de 6 números. Pronto!</li>
+      </ol>
+      <div id="wa-code-box" class="wa-code-box hidden">
+        <small>Seu código</small>
+        <strong id="wa-code">------</strong>
+        <small id="wa-code-expires"></small>
+      </div>
+      <button type="button" class="btn btn-primary" id="wa-generate">⚿ Gerar código</button>
+    </div>
+
+    <p id="wa-not-configured" class="wa-warn hidden">
+      ⚠️ O WhatsApp de verdade ainda não foi configurado na API (veja o arquivo <b>WHATSAPP.md</b>).
+      Enquanto isso, teste a conversa no <b>simulador</b> ao lado.
+    </p>
+  </article>
+
+  @* ===== Simulador ===== *@
+  <article class="panel wa-sim">
+    <div class="panel-heading">
+      <h2><span class="heading-icon">💬</span>Simulador</h2>
+      <span class="count">teste sem WhatsApp</span>
+    </div>
+    <p class="hint">É o mesmo bot do WhatsApp. Os lançamentos são salvos de verdade na sua conta.</p>
+
+    <div id="wa-chat" class="wa-chat" aria-live="polite">
+      <div class="wa-bubble bot">Olá! 👋 Envie um <b>valor</b> para começar. Ex.: <b>45,90</b></div>
+    </div>
+
+    <form id="wa-form" class="wa-form" autocomplete="off">
+      <input id="wa-input" maxlength="500" placeholder="Digite uma mensagem..." aria-label="Mensagem">
+      <button type="submit" class="btn btn-primary" id="wa-send">Enviar ➤</button>
+    </form>
+  </article>
+</section>
+
+<div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/transacoes.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/whatsapp.css" asp-append-version="true" />
+}
+@section Scripts {
+    <script src="~/js/whatsapp.js" asp-append-version="true"></script>
+}

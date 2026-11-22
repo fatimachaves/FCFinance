@@ -11,7 +11,6 @@
       @* Atalhos para a tela de cadastro (Transacoes). asp-fragment gera o "#aba" no final do link. *@
       <a class="quick-btn income" asp-controller="Transacoes" asp-action="Index" asp-fragment="nova" title="Cadastrar receita">↑ Adicionar Receita</a>
       <a class="quick-btn expense" asp-controller="Transacoes" asp-action="Index" asp-route-tipo="despesa" asp-fragment="nova" title="Cadastrar despesa">↓ Adicionar Despesa</a>
-      <span class="notification" title="Notificações">♧<i>2</i></span>
       <label class="period-select">
         <span>▦</span>
         <select id="period-filter" aria-label="Período">
@@ -31,11 +30,11 @@
   <section class="summary-grid" aria-label="Resumo financeiro">
     <article class="summary-card income-card">
       <div class="summary-head"><div class="summary-icon">▣</div><div><span>Receitas</span><strong id="total-income">R$ 0,00</strong></div></div>
-      <div class="summary-foot"><span class="trend positive" id="income-trend">—</span><span>no período selecionado</span><div class="sparkline green"></div></div>
+      <div class="summary-foot"><span class="trend" id="income-trend">—</span><span id="income-trend-label">no período selecionado</span><div class="sparkline green"></div></div>
     </article>
     <article class="summary-card expense-card">
       <div class="summary-head"><div class="summary-icon">▤</div><div><span>Despesas</span><strong id="total-expense">R$ 0,00</strong></div></div>
-      <div class="summary-foot"><span class="trend negative" id="expense-trend">—</span><span>no período selecionado</span><div class="sparkline red"></div></div>
+      <div class="summary-foot"><span class="trend" id="expense-trend">—</span><span id="expense-trend-label">no período selecionado</span><div class="sparkline red"></div></div>
     </article>
     <article class="summary-card balance-card">
       <div class="summary-head"><div class="summary-icon">＄</div><div><span>Saldo do Período</span><strong id="total-balance">R$ 0,00</strong></div></div>
@@ -65,7 +64,7 @@
     </article>
     <article class="panel goals-panel">
       <div class="panel-heading"><h2><span class="heading-icon">◎</span>Suas Metas</h2><a class="see-all" asp-controller="Transacoes" asp-action="Index" asp-fragment="metas">Ver todas&nbsp; →</a></div>
-      <div id="goals-list" class="goals-list"><p class="empty-state">As metas serão exibidas aqui quando houver um endpoint de metas na API.</p></div>
+      <div id="goals-list" class="goals-list"><p class="empty-state">Carregando metas...</p></div>
     </article>
   </section>
 

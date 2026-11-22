@@ -4,8 +4,8 @@ namespace FCFinance.DTO
 {
     public class LoginDTO
     {
-        [Required] public string Login { get; set; } = "";
-        [Required] public string Senha { get; set; } = "";
+        [Required(ErrorMessage = "Informe o usuário.")] public string Login { get; set; } = "";
+        [Required(ErrorMessage = "Informe a senha.")] public string Senha { get; set; } = "";
         // true: token vale 30 dias (o app guarda e entra sozinho). false: vale 12 horas.
         public bool ManterConectado { get; set; }
     }
@@ -27,15 +27,22 @@ namespace FCFinance.DTO
 
     public class AlterarSenhaDTO
     {
-        [Required] public string SenhaAtual { get; set; } = "";
-        [Required, MinLength(8)] public string NovaSenha { get; set; } = "";
+        [Required(ErrorMessage = "Informe a senha atual.")] public string SenhaAtual { get; set; } = "";
+        [Required(ErrorMessage = "Informe a nova senha."), MinLength(8, ErrorMessage = "A senha precisa ter pelo menos 8 caracteres.")]
+        public string NovaSenha { get; set; } = "";
     }
 
     public class NovoUsuarioDTO
     {
-        [Required, StringLength(100)] public string Nome { get; set; } = "";
-        [Required, RegularExpression(@"^[a-zA-Z0-9._-]{3,30}$")] public string Login { get; set; } = "";
-        [Required, MinLength(8)] public string Senha { get; set; } = "";
+        [Required(ErrorMessage = "Informe o nome."), StringLength(100, ErrorMessage = "O nome pode ter no máximo {1} caracteres.")]
+        public string Nome { get; set; } = "";
+
+        [Required(ErrorMessage = "Informe o login.")]
+        [RegularExpression(@"^[a-zA-Z0-9._-]{3,30}$", ErrorMessage = "Use de 3 a 30 letras, números, ponto, hífen ou _ (sem espaços).")]
+        public string Login { get; set; } = "";
+
+        [Required(ErrorMessage = "Informe a senha."), MinLength(8, ErrorMessage = "A senha precisa ter pelo menos 8 caracteres.")]
+        public string Senha { get; set; } = "";
         public bool Admin { get; set; }
     }
 }

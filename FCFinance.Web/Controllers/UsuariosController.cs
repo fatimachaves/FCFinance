@@ -8,12 +8,19 @@ using Microsoft.EntityFrameworkCore;
 namespace FCFinance.Web.Controllers
 {
     // Cadastro de usuários: só o perfil Admin entra aqui.
+    // A lista é lida direto do banco; criar e excluir passam pela API (ver ApiUsuariosClient),
+    // que aplica as regras (perfil obrigatório, último admin, apagar os dados do usuário excluído).
     [Authorize(Roles = Perfis.Admin)]
     public class UsuariosController : Controller
     {
         private readonly UserManager<AppUser> _users;
+        private readonly ApiUsuariosClient _api;
 
-        public UsuariosController(UserManager<AppUser> users) => _users = users;
+        public UsuariosController(UserManager<AppUser> users, ApiUsuariosClient api)
+        {
+            _users = users;
+            _api = api;
+        }
 
         [HttpGet]
         public async Task<IActionResult> Index() => View(await Montar(new NovoUsuarioViewModel()));
@@ -24,15 +31,13 @@ namespace FCFinance.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new AppUser { UserName = novo.Login.Trim(), Nome = novo.Nome.Trim(), EmailConfirmed = true };
-                var result = await _users.CreateAsync(user, novo.Senha);
-                if (result.Succeeded)
+                var erro = await _api.CriarAsync(User, novo);
+                if (erro == null)
                 {
-                    await _users.AddToRoleAsync(user, novo.Admin ? Perfis.Admin : Perfis.Usuario);
-                    TempData["Sucesso"] = $"Usuário \"{user.UserName}\" criado.";
+                    TempData["Sucesso"] = $"Usuário \"{novo.Login.Trim()}\" criado.";
                     return RedirectToAction(nameof(Index));
                 }
-                foreach (var e in result.Errors) ModelState.AddModelError(string.Empty, ContaController.Traduzir(e));
+                ModelState.AddModelError(string.Empty, erro);
             }
             novo.Senha = "";
             return View("Index", await Montar(novo));
@@ -45,15 +50,10 @@ namespace FCFinance.Web.Controllers
             var user = await _users.FindByIdAsync(id);
             if (user == null) return RedirectToAction(nameof(Index));
 
-            if (user.Id == _users.GetUserId(User))
-                TempData["Erro"] = "Você não pode excluir o seu próprio usuário.";
-            else if (await _users.IsInRoleAsync(user, Perfis.Admin) && (await _users.GetUsersInRoleAsync(Perfis.Admin)).Count <= 1)
-                TempData["Erro"] = "Não é possível excluir o último administrador.";
-            else
-            {
-                await _users.DeleteAsync(user);
-                TempData["Sucesso"] = $"Usuário \"{user.UserName}\" excluído.";
-            }
+            var erro = await _api.ExcluirAsync(User, id);
+            if (erro == null) TempData["Sucesso"] = $"Usuário \"{user.UserName}\" e os dados dele foram excluídos.";
+            else TempData["Erro"] = erro;
+
             return RedirectToAction(nameof(Index));
         }
 

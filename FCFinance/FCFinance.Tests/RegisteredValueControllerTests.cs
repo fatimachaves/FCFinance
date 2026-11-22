@@ -1,6 +1,7 @@
 using FCFinance.Controllers;
 using FCFinance.DTO;
 using FCFinance.Models;
+using FCFinance.Services;
 using Microsoft.AspNetCore.Mvc;
 using ValueType = FCFinance.Models.ValueType;
 
@@ -8,6 +9,12 @@ namespace FCFinance.Tests
 {
     public class RegisteredValueControllerTests
     {
+        private static RegisteredValueController NewController(TestDb db)
+        {
+            var ctx = db.NewContext();
+            return new RegisteredValueController(ctx, new RegisteredValueService(ctx));
+        }
+
         // Cria categorias: uma de despesa do sistema, uma de receita do sistema e uma de despesa da Bia.
         private static (int despesaSistema, int receitaSistema, int despesaDaBia) Seed(TestDb db)
         {
@@ -29,7 +36,7 @@ namespace FCFinance.Tests
             using var db = new TestDb();
             var (despesa, _, _) = Seed(db);
 
-            var result = await new RegisteredValueController(db.NewContext()).As(Users.Ana)
+            var result = await NewController(db).As(Users.Ana)
                 .SetRegisteredValue(Lancamento(despesa, ValueType.Despesa, 62.07m));
 
             var created = Assert.IsType<CreatedAtActionResult>(result);
@@ -45,7 +52,7 @@ namespace FCFinance.Tests
             using var db = new TestDb();
             var (despesa, _, _) = Seed(db);
 
-            var result = await new RegisteredValueController(db.NewContext()).As(Users.Ana)
+            var result = await NewController(db).As(Users.Ana)
                 .SetRegisteredValue(Lancamento(despesa, ValueType.Receita));
 
             Assert.IsType<BadRequestObjectResult>(result);
@@ -57,7 +64,7 @@ namespace FCFinance.Tests
             using var db = new TestDb();
             var (_, _, despesaDaBia) = Seed(db);
 
-            var result = await new RegisteredValueController(db.NewContext()).As(Users.Ana)
+            var result = await NewController(db).As(Users.Ana)
                 .SetRegisteredValue(Lancamento(despesaDaBia, ValueType.Despesa));
 
             Assert.IsType<BadRequestObjectResult>(result);
@@ -68,11 +75,11 @@ namespace FCFinance.Tests
         {
             using var db = new TestDb();
             var (despesa, receita, _) = Seed(db);
-            await new RegisteredValueController(db.NewContext()).As(Users.Ana).SetRegisteredValue(Lancamento(despesa, ValueType.Despesa));
-            await new RegisteredValueController(db.NewContext()).As(Users.Ana).SetRegisteredValue(Lancamento(receita, ValueType.Receita));
-            await new RegisteredValueController(db.NewContext()).As(Users.Bia).SetRegisteredValue(Lancamento(despesa, ValueType.Despesa));
+            await NewController(db).As(Users.Ana).SetRegisteredValue(Lancamento(despesa, ValueType.Despesa));
+            await NewController(db).As(Users.Ana).SetRegisteredValue(Lancamento(receita, ValueType.Receita));
+            await NewController(db).As(Users.Bia).SetRegisteredValue(Lancamento(despesa, ValueType.Despesa));
 
-            var controller = new RegisteredValueController(db.NewContext()).As(Users.Ana);
+            var controller = NewController(db).As(Users.Ana);
             var todos = Assert.IsType<OkObjectResult>(await controller.ListRegisteredValue(null, null, null, null, null, null));
             Assert.Equal(2, Assert.IsAssignableFrom<IEnumerable<RegisteredValueResponseDTO>>(todos.Value).Count());
 

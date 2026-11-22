@@ -48,6 +48,15 @@ builder.Services.ConfigureApplicationCookie(options =>
 // Gera o token que o JavaScript das páginas usa para chamar a API.
 builder.Services.AddSingleton<ApiTokenService>();
 
+// Chamadas do servidor do site para a API (ex.: criar/excluir usuários). Endereço em "Api:BaseUrl".
+var apiBaseUrl = builder.Configuration["Api:BaseUrl"]
+    ?? throw new InvalidOperationException("Configure Api:BaseUrl (endereço da API) no appsettings.");
+builder.Services.AddHttpClient<ApiUsuariosClient>(client =>
+{
+    client.BaseAddress = new Uri(apiBaseUrl.TrimEnd('/') + "/");
+    client.Timeout = TimeSpan.FromSeconds(15);
+});
+
 // Todas as páginas exigem login, a não ser que tenham [AllowAnonymous] (ex.: a tela de login).
 builder.Services.AddControllersWithViews(options =>
     options.Filters.Add(new AuthorizeFilter(new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build())));

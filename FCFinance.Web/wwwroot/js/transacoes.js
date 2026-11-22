@@ -6,7 +6,6 @@ const API_BASE_URL = "https://localhost:7148/api";
 const ENDPOINTS = {
   values: `${API_BASE_URL}/RegisteredValue`, // GET lista | POST cria | PUT/DELETE {id}
   categories: `${API_BASE_URL}/Category`,    // GET lista | POST cria | PUT/DELETE {id}
-  accounts: `${API_BASE_URL}/Account`,       // opcional (se não existir, o campo Conta é ocultado)
   goals: `${API_BASE_URL}/Goals`             // GET lista | POST cria | PUT/DELETE {id}
 };
 // Confira os IDs na tabela ValueTypes do seu banco (1 = Receita, 2 = Despesa).
@@ -23,7 +22,7 @@ const toInputDate = (d) => d ? d.toLocaleDateString("sv-SE") : "";      // yyyy-
 const parseDate = (v) => { const d = new Date(v || ""); return isNaN(d) ? null : d; };
 const byDateDesc = (a, b) => (b.date?.getTime() || 0) - (a.date?.getTime() || 0);
 
-let categories = [], accounts = [], goals = [], values = [];
+let categories = [], goals = [], values = [];
 let txType = new URLSearchParams(location.search).get("tipo") === "despesa" ? "expense" : "income";
 let goalScope = "month";      // pílula do resumo de metas (aba Nova Transação)
 let goalFilter = "all";       // pílula da lista de metas (aba Metas)
@@ -90,14 +89,12 @@ const goalPct = (g) => g.target > 0 ? Math.min(100, Math.round(g.saved / g.targe
 /* ---------- Carregamento ---------- */
 const apiDown = (e) => showStatus(`${e.message}. Confirme se a API está rodando e se o CORS permite esta origem.`);
 async function load() {
-  const [cats, vals, accs, gls] = await Promise.all([
+  const [cats, vals, gls] = await Promise.all([
     api(ENDPOINTS.categories).catch(e => { apiDown(e); return []; }),
     api(ENDPOINTS.values).catch(e => { apiDown(e); return []; }),
-    api(ENDPOINTS.accounts).catch(() => null),
     api(ENDPOINTS.goals).catch(() => null)
   ]);
   categories = list(cats).map(normCategory);
-  accounts = accs === null ? null : list(accs).map(a => ({ id: pick(a, "id", "Id"), name: pick(a, "name", "Name") || "Conta" }));
   goals = gls === null ? null : list(gls).map(normGoal);
   values = list(vals).map(normValue).sort(byDateDesc);
   renderAll();
@@ -107,7 +104,7 @@ async function reloadCategories() { categories = list(await api(ENDPOINTS.catego
 async function reloadGoals() { goals = list(await api(ENDPOINTS.goals)).map(normGoal); }
 
 function renderAll() {
-  renderCategorySelects(); renderAccounts(); renderChips(); renderGoal();
+  renderCategorySelects(); renderChips(); renderGoal();
   renderRows(); renderGoalList(); renderCategoryList(); renderHistory();
 }
 
@@ -175,12 +172,6 @@ function renderCategorySelects() {
     : `<option value="">Nenhuma categoria de ${txType === "income" ? "receita" : "despesa"}</option>`) + toOptions(ofType);
   $("h-category").innerHTML = '<option value="">Todas as categorias</option>' + toOptions(categories);
   $("tx-category").value = keepTx; $("h-category").value = keepH;
-}
-function renderAccounts() {
-  if (accounts === null) { $("account-group").classList.add("hidden"); return; }
-  $("account-group").classList.remove("hidden");
-  $("tx-account").innerHTML = '<option value="">Selecione uma conta</option>' +
-    accounts.map(a => `<option value="${esc(a.id)}">${esc(a.name)}</option>`).join("");
 }
 const ICONS = [["moradia", "⌂"], ["casa", "⌂"], ["transporte", "🚗"], ["aliment", "🍴"], ["saúde", "♥"], ["saude", "♥"], ["mercado", "🛒"], ["lazer", "★"], ["educa", "✎"], ["salár", "＄"], ["salar", "＄"], ["invest", "↗"]];
 const catIcon = (name) => ICONS.find(([k]) => name.toLowerCase().includes(k))?.[1] || "•";
@@ -251,7 +242,6 @@ const txValue = moneyField($("tx-value"));
 function resetForm() {
   editingTxId = null;
   txValue.value = 0; $("tx-category").value = ""; $("tx-description").value = "";
-  $("tx-account").value = ""; $("tx-recurring").checked = false;
   $("tx-date").value = toInputDate(new Date());
   $("tx-form-title").textContent = "Cadastrar";
   $("tx-form-subtitle").textContent = "Adicione uma nova receita ou despesa";
@@ -293,10 +283,8 @@ $("tx-form").addEventListener("submit", async (e) => {
     value: txValue.value,
     createWhen: `${$("tx-date").value}T00:00:00`,
     categoryId: catId,
-    valueTypeId: TYPE_IDS[txType],
-    isRecurring: $("tx-recurring").checked        // ignorado pela API se o campo não existir
+    valueTypeId: TYPE_IDS[txType]
   };
-  if ($("tx-account").value) payload.accountId = Number($("tx-account").value);
   const editing = editingTxId;
   const btn = $("tx-save"); btn.disabled = true;
   try {

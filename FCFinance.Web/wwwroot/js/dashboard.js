@@ -105,15 +105,45 @@ async function initializeDashboard() {
   }
 }
 
-function getFilteredValues() {
+// Início do período selecionado (1º dia do mês, N-1 meses atrás). null = "Todo o período".
+function getPeriodStart() {
   const period = $("period-filter").value;
-  if (period === "all") return allValues;
-  const months = Number(period);
+  if (period === "all") return null;
   const start = new Date();
   start.setDate(1);
   start.setHours(0,0,0,0);
-  start.setMonth(start.getMonth() - (months - 1));
+  start.setMonth(start.getMonth() - (Number(period) - 1));
+  return start;
+}
+
+function getFilteredValues() {
+  const start = getPeriodStart();
+  if (!start) return allValues;
   return allValues.filter(v => v.date && v.date >= start);
+}
+
+// Período anterior com o mesmo tamanho (ex.: últimos 3 meses -> os 3 meses antes deles).
+function getPreviousValues() {
+  const end = getPeriodStart();
+  if (!end) return null;
+  const start = new Date(end);
+  start.setMonth(start.getMonth() - Number($("period-filter").value));
+  return allValues.filter(v => v.date && v.date >= start && v.date < end);
+}
+
+// Mostra a variação (%) em relação ao período anterior.
+// upIsGood: true para receitas (subir é bom), false para despesas (subir é ruim).
+function renderTrend(id, current, previous, upIsGood) {
+  const el = $(id), label = $(`${id}-label`);
+  el.classList.remove("positive", "negative");
+  if (previous === null) { el.textContent = "—"; label.textContent = "no período selecionado"; return; }
+  label.textContent = "vs. período anterior";
+  if (previous === 0) { el.textContent = current > 0 ? "novo" : "—"; el.title = "Sem valores no período anterior"; return; }
+  const change = (current - previous) / previous * 100;
+  const up = change >= 0;
+  el.textContent = `${up ? "▲" : "▼"} ${Math.abs(change).toLocaleString("pt-BR", { maximumFractionDigits: 1 })}%`;
+  el.title = `Período anterior: ${money(previous)}`;
+  el.classList.add(up === upIsGood ? "positive" : "negative");
 }
 
 function renderDashboard() {
@@ -125,6 +155,10 @@ function renderDashboard() {
   $("total-income").textContent = money(incomeTotal);
   $("total-expense").textContent = money(expenseTotal);
   $("total-balance").textContent = money(incomeTotal - expenseTotal);
+  const previous = getPreviousValues();
+  const sum = (list, filter) => list.filter(filter).reduce((s,v) => s + v.value, 0);
+  renderTrend("income-trend", incomeTotal, previous && sum(previous, isIncome), true);
+  renderTrend("expense-trend", expenseTotal, previous && sum(previous, isExpense), false);
   $("donut-total").textContent = money(expenseTotal).replace(",00", "");
   renderEvolution(values);
   renderCategories(expenses, expenseTotal);
@@ -274,7 +308,7 @@ function renderGoals(goals) {
             </div>
         `;
     });
-    $("goals-list").innerHTML = html;
+    $("goals-list").innerHTML = html || '<p class="empty-state">Nenhuma meta cadastrada. <a href="/Transacoes#metas">Criar uma meta</a></p>';
 }
 
 function formatCurrency(value) {

@@ -1,7 +1,7 @@
 /*
   Envia o token de login em todas as chamadas à API (fetch) feitas pelas páginas.
   O token é gerado pelo site e fica na <meta name="fcf-api-token"> do _Layout.
-  Carregado antes dos outros scripts, então funciona para dashboard.js, transacoes.js, category.js etc.
+  Carregado antes dos outros scripts, então funciona para dashboard.js, transacoes.js etc.
 */
 (function () {
   const token = document.querySelector('meta[name="fcf-api-token"]')?.content;

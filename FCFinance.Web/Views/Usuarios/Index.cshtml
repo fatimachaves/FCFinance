@@ -74,7 +74,7 @@
           @if (u.Id != meuId)
           {
             <form asp-action="Excluir" asp-route-id="@u.Id" method="post" class="inline-form"
-                  onsubmit="return confirm('Excluir o usuário @u.Login? Essa ação não pode ser desfeita.');">
+                  onsubmit="return confirm('Excluir o usuário @u.Login? Os lançamentos, metas e categorias dele também serão apagados. Essa ação não pode ser desfeita.');">
               <button type="submit" class="icon-btn danger" title="Excluir" aria-label="Excluir @u.Login">✕</button>
             </form>
           }
