@@ -108,3 +108,17 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:"DM Sans",sans-
 /* Menu lateral: botão Sair dentro de um formulário (POST com proteção antifalsificação) */
 .profile form{margin-left:auto}
 .profile #user-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+
+/* Menu recolhido: o JavaScript já troca a seta (‹ / ›), então o botão NÃO deve girar (girar desfazia a troca).
+   O botão fica no topo, centralizado, e a logo logo abaixo, sem encostar. */
+.sidebar.collapsed .sidebar-toggle{transform:none;top:14px;right:calc(50% - 14px)}
+.sidebar.collapsed .brand-mark{margin-top:44px}
+
+/* Card da Meta Prioritária: nome longo quebra em até 2 linhas e termina em "…" (o nome completo aparece ao passar o mouse).
+   min-width:0 deixa o bloco do texto encolher dentro do card (sem isso ele "vaza" para fora). */
+.goal-card .summary-head>div:last-child{flex:1;min-width:0}
+.goal-card .summary-head strong{
+  display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;
+  white-space:normal;overflow:hidden;text-overflow:ellipsis;overflow-wrap:anywhere;
+  font-size:18px;line-height:1.25}
+@media(max-width:600px){.goal-card .summary-head strong{font-size:15px}}
