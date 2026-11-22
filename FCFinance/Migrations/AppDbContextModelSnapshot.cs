@@ -48,40 +48,7 @@ namespace FCFinance.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Categories");
-                });
-
-            modelBuilder.Entity("FCFinance.Models.ChatSession", b =>
-                {
-                    b.Property<string>("PhoneNumber")
-                        .HasMaxLength(64)
-                        .HasColumnType("nvarchar(64)");
-
-                    b.Property<decimal?>("Amount")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int?>("CategoryId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("FailedCodeAttempts")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("FailedCodeWindowStart")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("Step")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("ValueTypeId")
-                        .HasColumnType("int");
-
-                    b.HasKey("PhoneNumber");
-
-                    b.ToTable("ChatSessions");
+                    b.ToTable("Categories", (string)null);
                 });
 
             modelBuilder.Entity("FCFinance.Models.Goal", b =>
@@ -131,23 +98,7 @@ namespace FCFinance.Migrations
                         .IsUnique()
                         .HasFilter("[IsPriority] = 1");
 
-                    b.ToTable("Goals");
-                });
-
-            modelBuilder.Entity("FCFinance.Models.ProcessedChatMessage", b =>
-                {
-                    b.Property<string>("MessageId")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<DateTime>("ReceivedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("MessageId");
-
-                    b.HasIndex("ReceivedAt");
-
-                    b.ToTable("ProcessedChatMessages");
+                    b.ToTable("Goals", (string)null);
                 });
 
             modelBuilder.Entity("FCFinance.Models.RegisteredValue", b =>
@@ -189,7 +140,7 @@ namespace FCFinance.Migrations
 
                     b.HasIndex("ValueTypeId");
 
-                    b.ToTable("RegisteredValues");
+                    b.ToTable("RegisteredValues", (string)null);
                 });
 
             modelBuilder.Entity("FCFinance.Models.ValueType", b =>
@@ -207,7 +158,7 @@ namespace FCFinance.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ValueTypes");
+                    b.ToTable("ValueTypes", (string)null);
 
                     b.HasData(
                         new
@@ -220,69 +171,6 @@ namespace FCFinance.Migrations
                             Id = 2,
                             Name = "Despesa"
                         });
-                });
-
-            modelBuilder.Entity("FCFinance.Models.WhatsAppLink", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("LinkedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("PhoneNumber")
-                        .IsRequired()
-                        .HasMaxLength(32)
-                        .HasColumnType("nvarchar(32)");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PhoneNumber")
-                        .IsUnique();
-
-                    b.HasIndex("UserId")
-                        .IsUnique();
-
-                    b.ToTable("WhatsAppLinks");
-                });
-
-            modelBuilder.Entity("FCFinance.Models.WhatsAppLinkCode", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasMaxLength(6)
-                        .HasColumnType("nvarchar(6)");
-
-                    b.Property<DateTime>("ExpiresAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Code")
-                        .IsUnique();
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("WhatsAppLinkCodes");
                 });
 
             modelBuilder.Entity("FCFinance.Models.Category", b =>

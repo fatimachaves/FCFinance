@@ -77,12 +77,6 @@ namespace FCFinance.Controllers
             await _context.RegisteredValues.Where(x => x.UserId == id).ExecuteDeleteAsync();
             await _context.Goals.Where(x => x.UserId == id).ExecuteDeleteAsync();
             await _context.Categories.Where(x => x.UserId == id).ExecuteDeleteAsync();
-            // WhatsApp: ligação do telefone, códigos pendentes e conversa do simulador.
-            var phones = await _context.WhatsAppLinks.Where(x => x.UserId == id).Select(x => x.PhoneNumber).ToListAsync();
-            phones.Add($"sim:{id}");
-            await _context.ChatSessions.Where(x => phones.Contains(x.PhoneNumber)).ExecuteDeleteAsync();
-            await _context.WhatsAppLinks.Where(x => x.UserId == id).ExecuteDeleteAsync();
-            await _context.WhatsAppLinkCodes.Where(x => x.UserId == id).ExecuteDeleteAsync();
             await transaction.CommitAsync();
 
             return NoContent();

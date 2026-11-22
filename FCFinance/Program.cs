@@ -3,8 +3,6 @@ using System.Text.Json.Serialization;
 using FCFinance.Auth;
 using FCFinance.Models;
 using FCFinance.Services;
-using FCFinance.Services.ChatBot;
-using FCFinance.Services.WhatsApp;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -56,20 +54,6 @@ builder.Services.AddSwaggerGen(options =>
 // Dados financeiros
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connection));
 builder.Services.AddScoped<RegisteredValueService>();
-
-// ---------- Bot do WhatsApp (ver WHATSAPP.md) ----------
-builder.Services.AddSingleton(TimeProvider.System);
-// Fuso usado para a data dos lançamentos feitos pelo bot ("hoje" no Brasil).
-builder.Services.AddSingleton(_ =>
-{
-    var id = builder.Configuration["App:TimeZone"] ?? "America/Sao_Paulo";
-    try { return TimeZoneInfo.FindSystemTimeZoneById(id); }
-    catch (TimeZoneNotFoundException) { return TimeZoneInfo.Local; }
-});
-builder.Services.AddScoped<ChatBotService>();
-// Segredos do WhatsApp (tokens da Meta) ficam em User Secrets: seção "WhatsApp".
-builder.Services.Configure<WhatsAppOptions>(builder.Configuration.GetSection("WhatsApp"));
-builder.Services.AddHttpClient<IWhatsAppSender, WhatsAppCloudClient>(client => client.Timeout = TimeSpan.FromSeconds(10));
 
 // ---------- Login (mesmas tabelas AspNet* que o site usa) ----------
 builder.Services.AddDbContext<AuthDbContext>(options => options.UseSqlServer(connection));

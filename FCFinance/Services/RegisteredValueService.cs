@@ -5,8 +5,8 @@ using ValueType = FCFinance.Models.ValueType;
 
 namespace FCFinance.Services
 {
-    // Regras para gravar lançamentos (receitas/despesas). Usado pela API (site/app) e pelo bot do WhatsApp,
-    // para que todos sigam exatamente as mesmas validações.
+    // Regras para gravar lançamentos (receitas/despesas), num lugar só, para que toda forma de
+    // cadastro (site, app, importações futuras) siga exatamente as mesmas validações.
     public class RegisteredValueService
     {
         private readonly AppDbContext _context;

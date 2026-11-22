@@ -11,9 +11,7 @@
   </summary>
   <div class="user-drop">
     <a asp-controller="Home" asp-action="Index">⌂ Dashboard</a>
-    <a asp-controller="Transacoes" asp-action="Index">▤ Cadastros</a>
-    <a asp-controller="WhatsApp" asp-action="Index">💬 WhatsApp</a>
-    @if (isAdmin)
+    <a asp-controller="Transacoes" asp-action="Index">▤ Cadastros</a>    @if (isAdmin)
     {
       <a asp-controller="Usuarios" asp-action="Index">◉ Usuários</a>
     }
