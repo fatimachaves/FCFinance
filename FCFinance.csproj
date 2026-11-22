@@ -4,9 +4,20 @@
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>22b43dd6-c85d-4e10-9ec7-658bcf30026d</UserSecretsId>
   </PropertyGroup>
 
+  <!-- O projeto de testes fica dentro desta pasta: não compilar os arquivos dele aqui. -->
   <ItemGroup>
+    <Compile Remove="FCFinance.Tests\**" />
+    <Content Remove="FCFinance.Tests\**" />
+    <None Remove="FCFinance.Tests\**" />
+    <EmbeddedResource Remove="FCFinance.Tests\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.14" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.14" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.14" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.14">
       <PrivateAssets>all</PrivateAssets>

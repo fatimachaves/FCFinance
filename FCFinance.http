@@ -1,6 +1,30 @@
-@FCFinance_HostAddress = http://localhost:5286
+@FCFinance_HostAddress = https://localhost:7148
 
-GET {{FCFinance_HostAddress}}/weatherforecast/
+# 1) Faça login e copie o "token" da resposta para a variável abaixo.
+POST {{FCFinance_HostAddress}}/api/Auth/login
+Content-Type: application/json
+
+{ "login": "seu-login", "senha": "sua-senha", "manterConectado": false }
+
+###
+
+@token = cole-o-token-aqui
+
+# 2) Exemplos de chamadas autenticadas
+GET {{FCFinance_HostAddress}}/api/RegisteredValue?from=2026-01-01&to=2026-12-31
+Authorization: Bearer {{token}}
+Accept: application/json
+
+###
+
+GET {{FCFinance_HostAddress}}/api/Category
+Authorization: Bearer {{token}}
+Accept: application/json
+
+###
+
+GET {{FCFinance_HostAddress}}/api/Goals/priority
+Authorization: Bearer {{token}}
 Accept: application/json
 
 ###

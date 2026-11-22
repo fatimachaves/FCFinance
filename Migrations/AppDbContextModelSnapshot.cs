@@ -30,35 +30,25 @@ namespace FCFinance.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CategoryTypeId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(60)
+                        .HasColumnType("nvarchar(60)");
+
+                    b.Property<int>("TypeId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CategoryTypeId");
+                    b.HasIndex("TypeId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Categories");
-                });
-
-            modelBuilder.Entity("FCFinance.Models.CategoryType", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("CategoriesType");
                 });
 
             modelBuilder.Entity("FCFinance.Models.Goal", b =>
@@ -73,6 +63,7 @@ namespace FCFinance.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<decimal>("CurrentValue")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime?>("EndDate")
@@ -81,17 +72,31 @@ namespace FCFinance.Migrations
                     b.Property<bool>("IsMonthly")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsPriority")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<DateTime?>("ReferenceDate")
                         .HasColumnType("datetime2");
 
                     b.Property<decimal>("TargetValue")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId", "IsPriority")
+                        .IsUnique()
+                        .HasFilter("[IsPriority] = 1");
 
                     b.ToTable("Goals");
                 });
@@ -112,10 +117,17 @@ namespace FCFinance.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)");
 
-                    b.Property<float>("Value")
-                        .HasColumnType("real");
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<decimal>("Value")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("ValueTypeId")
                         .HasColumnType("int");
@@ -123,6 +135,8 @@ namespace FCFinance.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CategoryId");
+
+                    b.HasIndex("UserId");
 
                     b.HasIndex("ValueTypeId");
 
@@ -139,22 +153,35 @@ namespace FCFinance.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.HasKey("Id");
 
                     b.ToTable("ValueTypes");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Receita"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Despesa"
+                        });
                 });
 
             modelBuilder.Entity("FCFinance.Models.Category", b =>
                 {
-                    b.HasOne("FCFinance.Models.CategoryType", "CategoryType")
-                        .WithMany("categories")
-                        .HasForeignKey("CategoryTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                    b.HasOne("FCFinance.Models.ValueType", "Type")
+                        .WithMany("Categories")
+                        .HasForeignKey("TypeId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.Navigation("CategoryType");
+                    b.Navigation("Type");
                 });
 
             modelBuilder.Entity("FCFinance.Models.RegisteredValue", b =>
@@ -162,13 +189,13 @@ namespace FCFinance.Migrations
                     b.HasOne("FCFinance.Models.Category", "Category")
                         .WithMany("registeredValues")
                         .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("FCFinance.Models.ValueType", "ValueType")
                         .WithMany("RegisteredValues")
                         .HasForeignKey("ValueTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Category");
@@ -181,13 +208,10 @@ namespace FCFinance.Migrations
                     b.Navigation("registeredValues");
                 });
 
-            modelBuilder.Entity("FCFinance.Models.CategoryType", b =>
-                {
-                    b.Navigation("categories");
-                });
-
             modelBuilder.Entity("FCFinance.Models.ValueType", b =>
                 {
+                    b.Navigation("Categories");
+
                     b.Navigation("RegisteredValues");
                 });
 #pragma warning restore 612, 618

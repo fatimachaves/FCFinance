@@ -1,4 +1,5 @@
 <Solution>
   <Project Path="../FCFinance.Web/FCFinance.Web.csproj" Id="83bc99e2-9448-4b0b-9a01-b63eb0fc7931" />
   <Project Path="FCFinance.csproj" />
+  <Project Path="FCFinance.Tests/FCFinance.Tests.csproj" />
 </Solution>
