@@ -12,7 +12,7 @@ namespace FCFinance.Tests
 
         private static async Task<int> CreateAsync(TestDb db, string userId, GoalDTO dto)
         {
-            var result = await new GoalsController(db.NewContext()).As(userId).SetGoal(dto);
+            var result = await new GoalsController(db.NewContext(userId)).As(userId).SetGoal(dto);
             var created = Assert.IsType<CreatedAtActionResult>(result);
             return Assert.IsType<GoalResponseDTO>(created.Value).Id;
         }
@@ -24,7 +24,7 @@ namespace FCFinance.Tests
             var primeira = await CreateAsync(db, Users.Ana, NewGoal("Viagem", priority: true));
             var segunda = await CreateAsync(db, Users.Ana, NewGoal("Reserva"));
 
-            await new GoalsController(db.NewContext()).As(Users.Ana).SetPriority(segunda);
+            await new GoalsController(db.NewContext(Users.Ana)).As(Users.Ana).SetPriority(segunda);
 
             using var check = db.NewContext();
             var prioritarias = await check.Goals.Where(g => g.UserId == Users.Ana && g.IsPriority).Select(g => g.Id).ToListAsync();
@@ -49,7 +49,7 @@ namespace FCFinance.Tests
             using var db = new TestDb();
             var metaDaAna = await CreateAsync(db, Users.Ana, NewGoal("Meta da Ana"));
 
-            var comoBia = new GoalsController(db.NewContext()).As(Users.Bia);
+            var comoBia = new GoalsController(db.NewContext(Users.Bia)).As(Users.Bia);
             Assert.IsType<NotFoundObjectResult>(await comoBia.GetGoal(metaDaAna));
             Assert.IsType<NotFoundObjectResult>(await comoBia.DeleteGoal(metaDaAna));
 

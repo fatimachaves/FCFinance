@@ -59,3 +59,35 @@
 .perfil-opt input{position:absolute;opacity:0;width:0;height:0}
 .perfil-opt:has(input:checked){background:linear-gradient(180deg,#0f6a3e,#0b4d30);border-color:#18c473;box-shadow:0 0 18px #19d77b44}
 .perfil-opt:has(input:focus-visible){outline:2px solid #52ee9b;outline-offset:2px}
+
+/* ---------- Fase 2: cadastro, senha, minha conta, 2FA ---------- */
+.auth-solo{width:100%;max-width:480px}
+.auth-links{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-top:16px;font-size:14px}
+.auth-links a,.auth-card p a,.legal a{color:#43ed98;text-decoration:none}
+.auth-links a:hover,.auth-card p a:hover{text-decoration:underline}
+.auth-card p{color:#c3cdd9;line-height:1.55}
+.auth-icon-big{font-size:46px;text-align:center;margin:4px 0 10px}
+.check-row a{color:#43ed98}
+.link-btn{border:0;background:none;padding:0;color:#43ed98;font:inherit;cursor:pointer;text-decoration:underline}
+
+.account-sections{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;align-items:start}
+.account-sections .panel h2{margin:0 0 4px;font:800 19px Manrope,sans-serif}
+.account-sections .panel>p{margin:0 0 16px;color:#9aa7b6;font-size:13.5px}
+.status-pill{display:inline-block;padding:2px 9px;border-radius:7px;font-size:12px;font-weight:700}
+.status-pill.ok{background:#0b5b39;color:#4ff0a1}
+.status-pill.warn{background:#4a3a0b;color:#ffc94a}
+.danger-zone{border-color:#6b2630 !important}
+.danger-zone h2{color:#ff8c93}
+.row-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+
+.qr-box{display:flex;gap:20px;align-items:center;flex-wrap:wrap;margin:10px 0 18px}
+.qr-box img{width:180px;height:180px;border-radius:12px;background:#fff;padding:8px}
+.secret-key{font:700 16px/1.5 monospace;letter-spacing:1px;color:#43ed98;word-break:break-all}
+.codes-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:14px 0;padding:14px;border-radius:12px;background:#0d2119;border:1px dashed #19b86f}
+.codes-grid code{font:700 16px monospace;color:#e9fff3;text-align:center}
+
+.legal{max-width:760px;line-height:1.65;color:#d4dbe4}
+.legal h1{font:800 30px Manrope,sans-serif}
+.legal h2{font:800 19px Manrope,sans-serif;margin-top:26px}
+
+@media(max-width:850px){.account-sections{grid-template-columns:1fr}}

@@ -24,13 +24,15 @@
       <div><h1>Entrar</h1><p>Acesse sua conta para continuar</p></div>
     </div>
 
+    @if (TempData["Sucesso"] is string ok) { <div class="alert-ok">✓ @ok</div> }
+
     <form asp-action="Login" method="post" novalidate>
       <input type="hidden" asp-for="ReturnUrl" />
       <div asp-validation-summary="ModelOnly" class="auth-alert"></div>
 
       <div class="field-group">
-        <label asp-for="Login">Usuário</label>
-        <div class="field"><span class="field-icon">◉</span><input asp-for="Login" autocomplete="username" placeholder="Seu usuário" autofocus></div>
+        <label asp-for="Login">E-mail ou usuário</label>
+        <div class="field"><span class="field-icon">◉</span><input asp-for="Login" autocomplete="username" placeholder="voce@email.com" autofocus></div>
         <span asp-validation-for="Login" class="field-error"></span>
       </div>
 
@@ -51,6 +53,19 @@
 
       <button type="submit" class="btn btn-primary auth-submit">Entrar&nbsp; →</button>
     </form>
+
+    @if (ViewBag.ReenviarPara is string reenviar && !string.IsNullOrEmpty(reenviar))
+    {
+      <form asp-action="ReenviarConfirmacao" method="post" class="hint">
+        <input type="hidden" name="Email" value="@reenviar" />
+        Não recebeu? <button type="submit" class="link-btn">Reenviar o link de confirmação</button>
+      </form>
+    }
+
+    <div class="auth-links">
+      <a asp-action="EsqueciSenha">Esqueci minha senha</a>
+      <a asp-action="Cadastrar">Criar conta →</a>
+    </div>
   </section>
 </main>
 

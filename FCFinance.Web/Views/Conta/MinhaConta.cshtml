@@ -1,0 +1,113 @@
+@model MinhaContaViewModel
+@{
+    ViewData["Title"] = "Minha conta";
+}
+
+<header class="topbar">
+  <div>
+    <h1>Minha conta</h1>
+    <p>Seus dados, segurança e privacidade.</p>
+  </div>
+  <div class="top-actions">
+    <a class="quick-btn" asp-controller="Home" asp-action="Index">← Dashboard</a>
+    <partial name="_UserMenu" />
+  </div>
+</header>
+
+@if (TempData["Sucesso"] is string ok) { <div class="alert-ok">✓ @ok</div> }
+@if (TempData["Erro"] is string erro) { <div class="alert-err">@erro</div> }
+<div asp-validation-summary="ModelOnly" class="auth-alert"></div>
+
+<section class="account-sections">
+  @* ===== Dados pessoais ===== *@
+  <article class="panel tx-form-panel">
+    <h2>👤 Dados pessoais</h2>
+    <p>Login: <b>@Model.Login</b></p>
+    <form asp-action="AlterarNome" method="post" novalidate>
+      <div class="field-group">
+        <label asp-for="Nome">Nome</label>
+        <div class="field"><span class="field-icon">✎</span><input asp-for="Nome" autocomplete="name"></div>
+        <span asp-validation-for="Nome" class="field-error"></span>
+      </div>
+      <button type="submit" class="btn btn-primary">✓ Salvar nome</button>
+    </form>
+  </article>
+
+  @* ===== E-mail ===== *@
+  <article class="panel tx-form-panel">
+    <h2>✉️ E-mail</h2>
+    @if (Model.EmailConfirmado)
+    {
+      <p>@Model.EmailAtual <span class="status-pill ok">confirmado</span></p>
+    }
+    else
+    {
+      <p><span class="status-pill warn">sem e-mail</span> Cadastre um e-mail para conseguir recuperar a senha e receber avisos de segurança.</p>
+    }
+    <form asp-action="AlterarEmail" method="post" novalidate>
+      <div class="field-group">
+        <label for="NovoEmail">@(Model.EmailConfirmado ? "Trocar para" : "Cadastrar e-mail")</label>
+        <div class="field"><span class="field-icon">@@</span><input id="NovoEmail" name="NovoEmail" type="email" autocomplete="email" placeholder="voce@email.com" maxlength="256"></div>
+      </div>
+      <button type="submit" class="btn btn-primary">Enviar link de confirmação</button>
+    </form>
+  </article>
+
+  @* ===== Senha e verificação em duas etapas ===== *@
+  <article class="panel tx-form-panel">
+    <h2>🔐 Segurança</h2>
+    <p>Senha e verificação em duas etapas.</p>
+    <a class="btn btn-outline" asp-action="AlterarSenha">⚿ Alterar senha</a>
+
+    <h2 style="margin-top:22px">Verificação em duas etapas</h2>
+    @if (Model.DoisFatoresAtivo)
+    {
+      <p><span class="status-pill ok">ativa</span> O login pede o código do app autenticador. Códigos de recuperação restantes: <b>@Model.CodigosRecuperacaoRestantes</b>.</p>
+      <div class="row-actions">
+        <form asp-action="GerarNovosCodigos" method="post" data-confirm="Gerar novos códigos de recuperação? Os códigos antigos deixam de funcionar.">
+          <button type="submit" class="btn btn-outline">↻ Novos códigos de recuperação</button>
+        </form>
+      </div>
+      <form asp-action="DesativarDoisFatores" method="post" novalidate class="row-actions">
+        <div class="field" style="flex:1;min-width:180px"><span class="field-icon">⚿</span><input name="Confirmar.Senha" type="password" autocomplete="current-password" placeholder="Sua senha para desativar" aria-label="Senha"></div>
+        <button type="submit" class="btn btn-danger" style="width:auto;margin:0">Desativar</button>
+      </form>
+    }
+    else
+    {
+      <p><span class="status-pill warn">desativada</span> Recomendado: além da senha, o login pede um código do seu celular.</p>
+      <a class="btn btn-primary" asp-action="AtivarDoisFatores">Ativar verificação em duas etapas</a>
+    }
+  </article>
+
+  @* ===== Privacidade (LGPD) ===== *@
+  <article class="panel tx-form-panel danger-zone">
+    <h2>🛡️ Privacidade e seus dados</h2>
+    <p>Você pode baixar uma cópia de todos os seus dados ou excluir a sua conta a qualquer momento (LGPD).</p>
+    <button type="button" class="btn btn-outline" id="exportar-dados">⬇ Baixar meus dados (JSON)</button>
+    <p class="hint" id="exportar-status"></p>
+
+    <h2 style="margin-top:22px">Excluir minha conta</h2>
+    @if (Model.UltimoAdmin)
+    {
+      <p>Você é o único administrador. Antes de excluir sua conta, torne outra pessoa administradora.</p>
+    }
+    else
+    {
+      <p>Apaga <b>para sempre</b> sua conta, seus lançamentos, metas e categorias. Não dá para desfazer.</p>
+      <form asp-action="ExcluirConta" method="post" novalidate class="row-actions"
+            data-confirm="Tem certeza? Sua conta e TODOS os seus dados serão apagados para sempre.">
+        <div class="field" style="flex:1;min-width:180px"><span class="field-icon">⚿</span><input name="Excluir.Senha" type="password" autocomplete="current-password" placeholder="Sua senha para confirmar" aria-label="Senha"></div>
+        <button type="submit" class="btn btn-danger" style="width:auto;margin:0">✕ Excluir conta</button>
+      </form>
+    }
+  </article>
+</section>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/transacoes.css" asp-append-version="true" />
+}
+@section Scripts {
+    <script src="~/js/auth.js" asp-append-version="true"></script>
+    <script src="~/js/minhaconta.js" asp-append-version="true"></script>
+}

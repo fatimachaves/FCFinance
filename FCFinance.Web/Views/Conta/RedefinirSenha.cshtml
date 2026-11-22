@@ -1,0 +1,37 @@
+@model RedefinirSenhaViewModel
+@{
+    ViewData["Title"] = "Criar nova senha";
+    Layout = "_AuthLayout";
+}
+
+<main class="auth-solo">
+  <section class="panel auth-card">
+    <div class="tx-title">
+      <span class="tx-title-icon">⚿</span>
+      <div><h1>Criar nova senha</h1><p>Mínimo de 8 caracteres, com letra maiúscula, minúscula e número</p></div>
+    </div>
+
+    <form asp-action="RedefinirSenha" method="post" novalidate>
+      <input type="hidden" asp-for="UserId" />
+      <input type="hidden" asp-for="Codigo" />
+      <div asp-validation-summary="All" class="auth-alert"></div>
+
+      <div class="field-group">
+        <label asp-for="NovaSenha">Nova senha</label>
+        <div class="field"><span class="field-icon">⚿</span><input asp-for="NovaSenha" autocomplete="new-password" autofocus>
+          <button type="button" class="show-pass" data-toggle-pass="NovaSenha" aria-label="Mostrar senha" title="Mostrar senha">👁</button></div>
+      </div>
+      <div class="field-group">
+        <label asp-for="ConfirmarSenha">Confirmar nova senha</label>
+        <div class="field"><span class="field-icon">⚿</span><input asp-for="ConfirmarSenha" autocomplete="new-password"></div>
+      </div>
+
+      <button type="submit" class="btn btn-primary auth-submit">✓ Salvar nova senha</button>
+    </form>
+    <div class="auth-links"><a asp-action="EsqueciSenha">Pedir outro link</a><a asp-action="Login">Voltar para o login</a></div>
+  </section>
+</main>
+
+@section Scripts {
+    <script src="~/js/auth.js" asp-append-version="true"></script>
+}

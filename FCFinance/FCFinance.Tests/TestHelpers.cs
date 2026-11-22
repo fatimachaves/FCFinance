@@ -21,8 +21,16 @@ namespace FCFinance.Tests
             db.Database.EnsureCreated(); // já cria os tipos 1 = Receita e 2 = Despesa (HasData)
         }
 
-        public AppDbContext NewContext() =>
-            new(new DbContextOptionsBuilder<AppDbContext>().UseSqlite(_connection).Options);
+        // Sem userId: contexto "do sistema", que enxerga tudo (para preparar e conferir dados nos testes).
+        // Com userId: igual a uma requisição daquele usuário (os filtros globais valem).
+        public AppDbContext NewContext(string? userId = null) =>
+            new(new DbContextOptionsBuilder<AppDbContext>().UseSqlite(_connection).Options, new TestUser(userId));
+
+        private sealed class TestUser(string? userId) : ICurrentUser
+        {
+            public string? UserId => userId;
+            public bool IsSystem => userId == null;
+        }
 
         public void Dispose() => _connection.Dispose();
     }

@@ -126,7 +126,8 @@ namespace FCFinance.Controllers
 
             // Não deixa excluir uma categoria que ainda tem lançamentos (de qualquer usuário,
             // no caso das categorias do sistema). O banco recusaria com erro 500.
-            var emUso = await _context.RegisteredValues.AnyAsync(x => x.CategoryId == id);
+            // IgnoreQueryFilters: uma categoria do sistema pode estar em uso por QUALQUER usuário, não só por quem exclui.
+            var emUso = await _context.RegisteredValues.IgnoreQueryFilters().AnyAsync(x => x.CategoryId == id);
             if (emUso)
                 return Conflict("Categoria em uso: mude ou exclua os lançamentos dela antes de excluir.");
 

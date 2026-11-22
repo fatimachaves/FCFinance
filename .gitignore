@@ -366,3 +366,5 @@ SENHAS-INICIAIS-APAGAR-DEPOIS.txt
 .claude/
 # Script antigo, desatualizado (os tipos agora são criados pela migration SeedValueTypes)
 Database/Inserts_Iniciais.sql
+# E-mails gravados em desenvolvimento (podem conter links de acesso)
+emails-dev/

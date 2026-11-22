@@ -7,6 +7,7 @@ namespace FCFinance.Web.Data
 {
     // A API agora exige login (token JWT). O JavaScript das páginas chama a API direto do navegador,
     // então o site gera um token para quem está logado e coloca na página (ver _Layout.cshtml).
+    // A Jwt:Key fica em User Secrets (fora do Git) e precisa ser IGUAL à da API.
     // Usa a mesma chave/emissor da API (seção "Jwt": Issuer/Audience no appsettings.Development.json, Key em User Secrets nos dois projetos).
     public class ApiTokenService
     {

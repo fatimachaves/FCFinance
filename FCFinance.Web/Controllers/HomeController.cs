@@ -1,4 +1,3 @@
-using FCFinance.Web.Data;
 using FCFinance.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,11 +12,12 @@ namespace FCFinance.Web.Controllers
             return View();
         }
 
-        [Authorize(Roles = Perfis.Admin)]
-        public IActionResult Privacy()
-        {
-            return View();
-        }
+        // Páginas legais: abertas para todos (o cadastro pede o aceite delas).
+        [AllowAnonymous]
+        public IActionResult Termos() => View();
+
+        [AllowAnonymous]
+        public IActionResult Privacidade() => View();
 
         [AllowAnonymous] // a página de erro precisa abrir mesmo sem login
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

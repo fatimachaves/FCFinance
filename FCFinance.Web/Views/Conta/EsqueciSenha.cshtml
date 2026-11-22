@@ -1,0 +1,28 @@
+@model EmailViewModel
+@{
+    ViewData["Title"] = "Esqueci minha senha";
+    Layout = "_AuthLayout";
+}
+
+<main class="auth-solo">
+  <section class="panel auth-card">
+    <div class="tx-title">
+      <span class="tx-title-icon">⚿</span>
+      <div><h1>Esqueci minha senha</h1><p>Vamos enviar um link para criar uma nova</p></div>
+    </div>
+
+    @if (TempData["Info"] is string info) { <div class="alert-ok">📬 @info</div> }
+
+    <form asp-action="EsqueciSenha" method="post" novalidate>
+      <div asp-validation-summary="All" class="auth-alert"></div>
+      <div class="field-group">
+        <label asp-for="Email">E-mail da sua conta</label>
+        <div class="field"><span class="field-icon">@@</span><input asp-for="Email" type="email" autocomplete="email" placeholder="voce@email.com" autofocus></div>
+      </div>
+      <button type="submit" class="btn btn-primary auth-submit">Enviar link&nbsp; →</button>
+    </form>
+
+    <p class="hint">Sua conta antiga não tem e-mail? Peça ao administrador para trocar a sua senha.</p>
+    <div class="auth-links"><span></span><a asp-action="Login">Voltar para o login</a></div>
+  </section>
+</main>

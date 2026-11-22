@@ -1,4 +1,5 @@
 @inject ApiTokenService ApiTokens
+@inject IConfiguration Config
 @{
     var controller = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
     string Active(string name) =>
@@ -12,6 +13,8 @@
     <title>@ViewData["Title"] - FCFinance</title>
     @* Token para o JavaScript chamar a API (ver wwwroot/js/apiAuth.js) *@
     <meta name="fcf-api-token" content="@ApiTokens.CriarPara(User)" />
+    @* Endereço da API (appsettings "Api:BaseUrl"), para o JavaScript não ter "localhost" fixo *@
+    <meta name="fcf-api-url" content="@(Config["Api:BaseUrl"]?.TrimEnd('/'))/api" />
     <script src="~/js/apiAuth.js" asp-append-version="true"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

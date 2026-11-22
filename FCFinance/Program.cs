@@ -54,6 +54,11 @@ builder.Services.AddSwaggerGen(options =>
 // Dados financeiros
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connection));
 builder.Services.AddScoped<RegisteredValueService>();
+builder.Services.AddScoped<UserDataService>();
+
+// Usuário da requisição: usado pelos filtros globais do AppDbContext (cada um só vê os próprios dados).
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICurrentUser, HttpCurrentUser>();
 
 // ---------- Login (mesmas tabelas AspNet* que o site usa) ----------
 builder.Services.AddDbContext<AuthDbContext>(options => options.UseSqlServer(connection));
@@ -67,6 +72,7 @@ builder.Services
         options.Password.RequireNonAlphanumeric = false;
         options.Lockout.MaxFailedAccessAttempts = 5;
         options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+        options.SignIn.RequireConfirmedEmail = true; // igual ao site: só entra quem confirmou o e-mail
         // Nomes das informações dentro do token
         options.ClaimsIdentity.UserIdClaimType = "sub";
         options.ClaimsIdentity.UserNameClaimType = "name";
@@ -74,6 +80,8 @@ builder.Services
     })
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<AuthDbContext>()
+    // Confere os códigos do app autenticador (verificação em duas etapas, ativada pelo site).
+    .AddTokenProvider<AuthenticatorTokenProvider<AppUser>>(TokenOptions.DefaultAuthenticatorProvider)
     .AddSignInManager();
 
 // ---------- Token JWT ----------

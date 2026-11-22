@@ -1,0 +1,29 @@
+@model EmailViewModel
+@{
+    ViewData["Title"] = "Confirme seu e-mail";
+    Layout = "_AuthLayout";
+}
+
+<main class="auth-solo">
+  <section class="panel auth-card">
+    <div class="auth-icon-big">📬</div>
+    <div class="tx-title"><div><h1>Confirme seu e-mail</h1></div></div>
+
+    <p>
+      Enviamos um link de confirmação para
+      @if (!string.IsNullOrEmpty(Model.Email)) { <b>@Model.Email</b> } else { <span>o seu e-mail</span> }.
+      Clique nele para ativar sua conta. O link vale por 3 horas.
+    </p>
+    <p class="hint">Não chegou? Confira a pasta de spam ou peça outro link:</p>
+
+    <form asp-action="ReenviarConfirmacao" method="post" novalidate>
+      <div asp-validation-summary="All" class="auth-alert"></div>
+      <div class="field-group">
+        <div class="field"><span class="field-icon">@@</span><input asp-for="Email" type="email" autocomplete="email" placeholder="voce@email.com"></div>
+      </div>
+      <button type="submit" class="btn btn-outline auth-submit">↻ Reenviar link</button>
+    </form>
+
+    <div class="auth-links"><span></span><a asp-action="Login">Voltar para o login</a></div>
+  </section>
+</main>

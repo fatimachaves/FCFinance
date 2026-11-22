@@ -25,10 +25,10 @@ namespace FCFinance.Tests
         {
             using var db = new TestDb();
             SeedSystemCategory(db);
-            await new CategoryController(db.NewContext()).As(Users.Ana).SetCategory(new CategoryDTO { Name = "Da Ana", CategoryTypeId = ValueType.Despesa });
-            await new CategoryController(db.NewContext()).As(Users.Bia).SetCategory(new CategoryDTO { Name = "Da Bia", CategoryTypeId = ValueType.Despesa });
+            await new CategoryController(db.NewContext(Users.Ana)).As(Users.Ana).SetCategory(new CategoryDTO { Name = "Da Ana", CategoryTypeId = ValueType.Despesa });
+            await new CategoryController(db.NewContext(Users.Bia)).As(Users.Bia).SetCategory(new CategoryDTO { Name = "Da Bia", CategoryTypeId = ValueType.Despesa });
 
-            var lista = Items(await new CategoryController(db.NewContext()).As(Users.Ana).ListCategories()).ToList();
+            var lista = Items(await new CategoryController(db.NewContext(Users.Ana)).As(Users.Ana).ListCategories()).ToList();
 
             Assert.Equal(new[] { "Mercado", "Da Ana" }, lista.Select(c => c.Name));
             Assert.True(lista[0].IsSystem);
@@ -43,10 +43,10 @@ namespace FCFinance.Tests
             var id = SeedSystemCategory(db);
             var dto = new CategoryDTO { Name = "Supermercado", CategoryTypeId = ValueType.Despesa };
 
-            var comoAna = await new CategoryController(db.NewContext()).As(Users.Ana).UpdateCategory(id, dto);
+            var comoAna = await new CategoryController(db.NewContext(Users.Ana)).As(Users.Ana).UpdateCategory(id, dto);
             Assert.Equal(403, Assert.IsType<ObjectResult>(comoAna).StatusCode);
 
-            var comoAdmin = await new CategoryController(db.NewContext()).As(Users.Admin, admin: true).UpdateCategory(id, dto);
+            var comoAdmin = await new CategoryController(db.NewContext(Users.Admin)).As(Users.Admin, admin: true).UpdateCategory(id, dto);
             Assert.IsType<OkObjectResult>(comoAdmin);
         }
 
@@ -55,7 +55,7 @@ namespace FCFinance.Tests
         {
             using var db = new TestDb();
 
-            var result = await new CategoryController(db.NewContext()).As(Users.Ana)
+            var result = await new CategoryController(db.NewContext(Users.Ana)).As(Users.Ana)
                 .SetCategory(new CategoryDTO { Name = "X", CategoryTypeId = 99 });
 
             Assert.IsType<BadRequestObjectResult>(result);

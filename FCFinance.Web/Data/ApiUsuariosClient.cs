@@ -33,6 +33,10 @@ namespace FCFinance.Web.Data
         public Task<string?> ExcluirAsync(ClaimsPrincipal admin, string id) =>
             EnviarAsync(admin, HttpMethod.Delete, $"api/Usuarios/{Uri.EscapeDataString(id)}", null);
 
+        // LGPD: o próprio usuário exclui a conta e todos os dados dele (a API confere a senha).
+        public Task<string?> ExcluirMinhaContaAsync(ClaimsPrincipal usuario, string senha) =>
+            EnviarAsync(usuario, HttpMethod.Post, "api/MinhaConta/excluir", JsonContent.Create(new { senha }));
+
         private async Task<string?> EnviarAsync(ClaimsPrincipal admin, HttpMethod method, string url, HttpContent? body)
         {
             var token = _tokens.CriarPara(admin);

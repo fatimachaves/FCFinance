@@ -11,6 +11,8 @@ namespace FCFinance.Auth
     public class AppUser : IdentityUser
     {
         public string Nome { get; set; } = "";
+        public DateTime? TermosAceitosEm { get; set; }
+        public DateTime? CriadoEm { get; set; }
     }
 
     public static class Perfis

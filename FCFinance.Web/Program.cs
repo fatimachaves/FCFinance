@@ -1,5 +1,6 @@
 using System.Threading.RateLimiting;
 using FCFinance.Web.Data;
+using FCFinance.Web.Data.Email;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.AspNetCore.Authorization;
@@ -28,7 +29,12 @@ builder.Services
         options.Lockout.MaxFailedAccessAttempts = 5;
         options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
 
-        options.User.RequireUniqueEmail = false; // login é pelo nome de usuário
+        // E-mail único é conferido no cadastro (ContaController). Não ligar RequireUniqueEmail aqui:
+        // ele recusa qualquer alteração em usuários antigos que ainda não têm e-mail.
+        options.User.RequireUniqueEmail = false;
+
+        // Só entra quem confirmou o e-mail (os usuários antigos já estão marcados como confirmados).
+        options.SignIn.RequireConfirmedEmail = true;
     })
     .AddEntityFrameworkStores<AuthDbContext>()
     .AddClaimsPrincipalFactory<AppClaimsFactory>() // coloca o Nome no cookie de login
@@ -51,6 +57,13 @@ builder.Services.ConfigureApplicationCookie(options =>
 // Confere a cada 1 minuto (em vez de 30) se o login ainda vale: depois de trocar a senha ou
 // excluir o usuário, as outras sessões abertas caem em até 1 minuto.
 builder.Services.Configure<SecurityStampValidatorOptions>(options => options.ValidationInterval = TimeSpan.FromMinutes(1));
+
+// Links enviados por e-mail (confirmar e-mail, redefinir senha, trocar e-mail) valem por 3 horas.
+builder.Services.Configure<DataProtectionTokenProviderOptions>(options => options.TokenLifespan = TimeSpan.FromHours(3));
+
+// E-mails: em desenvolvimento são gravados numa pasta; em produção vão pela Brevo (SMTP). Ver Data/Email.
+builder.Services.Configure<EmailOptions>(builder.Configuration.GetSection("Email"));
+builder.Services.AddSingleton<IEmailSender, EmailSender>();
 
 // Cookie de proteção dos formulários (antiforgery) também só em HTTPS.
 builder.Services.AddAntiforgery(options => options.Cookie.SecurePolicy = CookieSecurePolicy.Always);

@@ -1,0 +1,41 @@
+@{
+    ViewData["Title"] = "Termos de Uso";
+    Layout = "_AuthLayout";
+}
+
+@* RASCUNHO: estrutura de referência. O texto final precisa ser escrito/revisado por um advogado antes do lançamento. *@
+<main class="panel auth-card legal">
+  <div class="alert-err">⚠️ <b>Rascunho.</b> Este documento ainda será revisado por um advogado antes do lançamento do FCFinance.</div>
+
+  <h1>Termos de Uso</h1>
+  <p><i>Última atualização: [data]</i></p>
+
+  <h2>1. Quem somos</h2>
+  <p>O FCFinance é um serviço de organização financeira pessoal oferecido por [razão social], CNPJ [número], com sede em [endereço] ("nós").</p>
+
+  <h2>2. O serviço</h2>
+  <p>O FCFinance permite registrar receitas, despesas, categorias e metas e visualizar relatórios. O serviço é uma ferramenta de organização e <b>não constitui consultoria financeira, contábil ou de investimentos</b>.</p>
+
+  <h2>3. Sua conta</h2>
+  <p>Você é responsável pelas informações cadastradas, por manter sua senha em segredo e por todas as atividades na sua conta. Recomendamos ativar a verificação em duas etapas. Avise-nos imediatamente em caso de uso não autorizado.</p>
+
+  <h2>4. Planos, pagamentos e cancelamento</h2>
+  <p>[Descrever planos, período de teste, forma de cobrança, renovação automática, reajustes, inadimplência, cancelamento a qualquer momento e direito de arrependimento de 7 dias (Código de Defesa do Consumidor, art. 49).]</p>
+
+  <h2>5. Uso permitido</h2>
+  <p>É proibido usar o serviço para fins ilegais, tentar acessar dados de outros usuários, sobrecarregar ou atacar o sistema, ou fazer engenharia reversa.</p>
+
+  <h2>6. Disponibilidade e limitação de responsabilidade</h2>
+  <p>[Descrever disponibilidade esperada, manutenções, backups e os limites de responsabilidade permitidos por lei.]</p>
+
+  <h2>7. Encerramento</h2>
+  <p>Você pode excluir sua conta a qualquer momento em <b>Minha conta</b>; os dados são apagados conforme a Política de Privacidade. Podemos suspender contas que violem estes Termos.</p>
+
+  <h2>8. Alterações</h2>
+  <p>Podemos atualizar estes Termos. Mudanças relevantes serão avisadas por e-mail ou no próprio serviço.</p>
+
+  <h2>9. Foro</h2>
+  <p>[Lei aplicável e foro, respeitando o foro do domicílio do consumidor.]</p>
+
+  <p><a asp-controller="Home" asp-action="Privacidade">Política de Privacidade</a> · <a asp-controller="Conta" asp-action="Cadastrar">Voltar ao cadastro</a></p>
+</main>

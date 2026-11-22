@@ -1,0 +1,70 @@
+@model CadastroViewModel
+@{
+    ViewData["Title"] = "Criar conta";
+    Layout = "_AuthLayout";
+}
+
+<main class="auth-shell">
+  <section class="auth-promo" aria-hidden="true">
+    <div class="auth-brand"><span class="brand-mark">↗</span><span>FC<b>Finance</b></span></div>
+    <div>
+      <h2>Comece a organizar<br>suas finanças.</h2>
+      <p>Crie sua conta em menos de um minuto.</p>
+    </div>
+    <ul class="auth-points">
+      <li><i>↑</i>Receitas e despesas organizadas</li>
+      <li><i>◎</i>Metas com acompanhamento</li>
+      <li><i>⚿</i>Seus dados protegidos e só seus</li>
+    </ul>
+  </section>
+
+  <section class="panel auth-card">
+    <div class="tx-title">
+      <span class="tx-title-icon">+</span>
+      <div><h1>Criar conta</h1><p>Preencha seus dados para começar</p></div>
+    </div>
+
+    <form asp-action="Cadastrar" method="post" novalidate>
+      <div asp-validation-summary="All" class="auth-alert"></div>
+
+      <div class="field-group">
+        <label asp-for="Nome">Nome</label>
+        <div class="field"><span class="field-icon">✎</span><input asp-for="Nome" autocomplete="name" placeholder="Como quer ser chamado(a)" autofocus></div>
+      </div>
+
+      <div class="field-group">
+        <label asp-for="Email">E-mail</label>
+        <div class="field"><span class="field-icon">@@</span><input asp-for="Email" type="email" autocomplete="email" placeholder="voce@email.com"></div>
+      </div>
+
+      <div class="form-grid">
+        <div class="field-group">
+          <label asp-for="Senha">Senha</label>
+          <div class="field"><span class="field-icon">⚿</span><input asp-for="Senha" autocomplete="new-password">
+            <button type="button" class="show-pass" data-toggle-pass="Senha" aria-label="Mostrar senha" title="Mostrar senha">👁</button></div>
+        </div>
+        <div class="field-group">
+          <label asp-for="ConfirmarSenha">Confirmar senha</label>
+          <div class="field"><span class="field-icon">⚿</span><input asp-for="ConfirmarSenha" autocomplete="new-password"></div>
+        </div>
+      </div>
+      <p class="hint">Mínimo de 8 caracteres, com letra maiúscula, minúscula e número.</p>
+
+      <label class="check-row">
+        <input asp-for="AceitoTermos" type="checkbox"><span class="check-box"></span>
+        <span>Li e aceito os <a asp-controller="Home" asp-action="Termos" target="_blank">Termos de Uso</a> e a <a asp-controller="Home" asp-action="Privacidade" target="_blank">Política de Privacidade</a></span>
+      </label>
+
+      <button type="submit" class="btn btn-primary auth-submit">Criar minha conta&nbsp; →</button>
+    </form>
+
+    <div class="auth-links">
+      <span></span>
+      <a asp-action="Login">Já tenho conta: entrar</a>
+    </div>
+  </section>
+</main>
+
+@section Scripts {
+    <script src="~/js/auth.js" asp-append-version="true"></script>
+}

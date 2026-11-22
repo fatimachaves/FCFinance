@@ -1,0 +1,51 @@
+@{
+    ViewData["Title"] = "Política de Privacidade";
+    Layout = "_AuthLayout";
+}
+
+@* RASCUNHO: estrutura baseada nos itens que a LGPD (Lei 13.709/2018) pede. Revisar com advogado antes do lançamento. *@
+<main class="panel auth-card legal">
+  <div class="alert-err">⚠️ <b>Rascunho.</b> Este documento ainda será revisado por um advogado antes do lançamento do FCFinance.</div>
+
+  <h1>Política de Privacidade</h1>
+  <p><i>Última atualização: [data]</i></p>
+
+  <h2>1. Controlador e contato</h2>
+  <p>[Razão social], CNPJ [número], é o controlador dos seus dados pessoais. Encarregado (DPO) / canal de privacidade: [e-mail].</p>
+
+  <h2>2. Quais dados coletamos</h2>
+  <ul>
+    <li><b>Cadastro:</b> nome, e-mail e senha (guardada de forma criptografada, nunca em texto).</li>
+    <li><b>Dados financeiros que você registra:</b> lançamentos (valor, data, descrição), categorias e metas.</li>
+    <li><b>Dados técnicos:</b> endereço IP e registros de acesso, para segurança e prevenção de fraudes.</li>
+    <li><b>Pagamento:</b> [processado pelo gateway; não armazenamos dados de cartão].</li>
+  </ul>
+
+  <h2>3. Para que usamos e base legal</h2>
+  <ul>
+    <li>Prestar o serviço contratado (execução de contrato).</li>
+    <li>Segurança da conta e prevenção de fraudes (legítimo interesse).</li>
+    <li>Cumprir obrigações legais e fiscais (obrigação legal).</li>
+    <li>[Comunicações de marketing, somente com seu consentimento.]</li>
+  </ul>
+
+  <h2>4. Com quem compartilhamos</h2>
+  <p>Somente com fornecedores necessários para o serviço, por exemplo: hospedagem/banco de dados [provedor], envio de e-mails (Brevo) e pagamentos [gateway]. <b>Não vendemos seus dados.</b></p>
+
+  <h2>5. Por quanto tempo guardamos</h2>
+  <p>Enquanto sua conta existir. Ao excluir a conta, seus dados financeiros são apagados imediatamente; [registros exigidos por lei são mantidos pelo prazo legal].</p>
+
+  <h2>6. Seus direitos</h2>
+  <p>Você pode, a qualquer momento: confirmar e acessar seus dados, corrigi-los, <b>baixar uma cópia</b> (Minha conta → Baixar meus dados), <b>excluir sua conta</b> (Minha conta → Excluir conta), revogar consentimentos e reclamar à ANPD.</p>
+
+  <h2>7. Segurança</h2>
+  <p>Usamos conexão criptografada (HTTPS), senhas com hash, verificação em duas etapas opcional, limite de tentativas de login e isolamento dos dados de cada usuário.</p>
+
+  <h2>8. Cookies</h2>
+  <p>Usamos apenas cookies essenciais: o de login e o de proteção dos formulários. [Atualizar se usar ferramentas de análise.]</p>
+
+  <h2>9. Alterações</h2>
+  <p>Avisaremos por e-mail ou no serviço quando houver mudanças relevantes nesta política.</p>
+
+  <p><a asp-controller="Home" asp-action="Termos">Termos de Uso</a> · <a asp-controller="Conta" asp-action="Cadastrar">Voltar ao cadastro</a></p>
+</main>

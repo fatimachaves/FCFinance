@@ -1,13 +1,21 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using FCFinance.Auth;
+using Microsoft.EntityFrameworkCore;
 
 namespace FCFinance.Models
 {
     public class AppDbContext : DbContext
     {
-        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
-        {
+        private readonly ICurrentUser? _currentUser;
 
+        public AppDbContext(DbContextOptions<AppDbContext> options, ICurrentUser? currentUser = null) : base(options)
+        {
+            _currentUser = currentUser;
         }
+
+        // Usados pelos filtros globais (o EF lê estes valores a cada consulta, por instância do contexto).
+        // Sem ICurrentUser (ex.: ferramentas do EF), UserId é null: os filtros não devolvem dados de usuário.
+        public string? CurrentUserId => _currentUser?.UserId;
+        public bool IgnoreUserFilter => _currentUser?.IsSystem == true;
         //Nenhum relacionamento terá exclusão em cascata configurada pelo EF Core.
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -42,6 +50,13 @@ namespace FCFinance.Models
             modelBuilder.Entity<ValueType>().HasData(
                 new ValueType { Id = ValueType.Receita, Name = "Receita" },
                 new ValueType { Id = ValueType.Despesa, Name = "Despesa" });
+
+            // FILTROS GLOBAIS: cada usuário só enxerga os próprios dados (categorias do sistema são de todos).
+            // Para ver dados de outros usuários (ex.: admin excluindo uma conta), é preciso pedir
+            // explicitamente .IgnoreQueryFilters(); isso deixa claro no código quando a regra é quebrada.
+            modelBuilder.Entity<RegisteredValue>().HasQueryFilter(r => IgnoreUserFilter || r.UserId == CurrentUserId);
+            modelBuilder.Entity<Goal>().HasQueryFilter(g => IgnoreUserFilter || g.UserId == CurrentUserId);
+            modelBuilder.Entity<Category>().HasQueryFilter(c => IgnoreUserFilter || c.UserId == null || c.UserId == CurrentUserId);
 
             // Garante no banco que cada usuário tem no máximo UMA meta prioritária.
             modelBuilder.Entity<Goal>()

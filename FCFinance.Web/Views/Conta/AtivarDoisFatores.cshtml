@@ -1,0 +1,47 @@
+@model AtivarDoisFatoresViewModel
+@{
+    ViewData["Title"] = "Ativar verificação em duas etapas";
+}
+
+<header class="topbar">
+  <div>
+    <h1>Verificação em duas etapas 🔐</h1>
+    <p>Proteja sua conta com um código do celular.</p>
+  </div>
+  <div class="top-actions">
+    <a class="quick-btn" asp-action="MinhaConta">← Minha conta</a>
+    <partial name="_UserMenu" />
+  </div>
+</header>
+
+<article class="panel tx-form-panel account-narrow" style="max-width:640px">
+  <ol class="hint" style="font-size:14.5px;line-height:1.9;color:#cfd8e3">
+    <li>Instale um app autenticador no celular: <b>Google Authenticator</b>, <b>Microsoft Authenticator</b> ou <b>Authy</b> (todos grátis).</li>
+    <li>No app, toque em <b>+</b> e <b>leia o QR code</b> abaixo.</li>
+    <li>Digite o código de 6 números que aparece no app.</li>
+  </ol>
+
+  <div class="qr-box">
+    <img src="@Model.QrCodeDataUri" alt="QR code para o app autenticador" />
+    <div>
+      <small class="hint">Não consegue ler o QR code? Digite esta chave no app:</small>
+      <div class="secret-key">@Model.ChaveFormatada</div>
+    </div>
+  </div>
+
+  <form asp-action="AtivarDoisFatores" method="post" novalidate>
+    <div asp-validation-summary="All" class="auth-alert"></div>
+    <div class="field-group">
+      <label asp-for="Codigo">Código do app</label>
+      <div class="field"><span class="field-icon">#</span><input asp-for="Codigo" autocomplete="one-time-code" inputmode="numeric" placeholder="123456" autofocus></div>
+    </div>
+    <div class="form-actions spaced">
+      <a class="btn btn-outline" asp-action="MinhaConta">Cancelar</a>
+      <button type="submit" class="btn btn-primary">✓ Ativar</button>
+    </div>
+  </form>
+</article>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/transacoes.css" asp-append-version="true" />
+}

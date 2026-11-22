@@ -1,6 +1,6 @@
 using FCFinance.Auth;
 using FCFinance.DTO;
-using FCFinance.Models;
+using FCFinance.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -16,13 +16,13 @@ namespace FCFinance.Controllers
     {
         private readonly UserManager<AppUser> _users;
         private readonly RoleManager<IdentityRole> _roles;
-        private readonly AppDbContext _context;
+        private readonly UserDataService _data;
 
-        public UsuariosController(UserManager<AppUser> users, RoleManager<IdentityRole> roles, AppDbContext context)
+        public UsuariosController(UserManager<AppUser> users, RoleManager<IdentityRole> roles, UserDataService data)
         {
             _users = users;
             _roles = roles;
-            _context = context;
+            _data = data;
         }
 
         [HttpGet]
@@ -71,13 +71,8 @@ namespace FCFinance.Controllers
             var result = await _users.DeleteAsync(user);
             if (!result.Succeeded) return BadRequest(Erros.Traduzir(result));
 
-            // Apaga os dados financeiros do usuário (lançamentos antes das categorias, por causa da FK).
-            // Categorias do sistema (UserId = null) não são afetadas.
-            await using var transaction = await _context.Database.BeginTransactionAsync();
-            await _context.RegisteredValues.Where(x => x.UserId == id).ExecuteDeleteAsync();
-            await _context.Goals.Where(x => x.UserId == id).ExecuteDeleteAsync();
-            await _context.Categories.Where(x => x.UserId == id).ExecuteDeleteAsync();
-            await transaction.CommitAsync();
+            // Apaga os dados financeiros do usuário (as categorias do sistema não são afetadas).
+            await _data.DeleteAllAsync(id);
 
             return NoContent();
         }

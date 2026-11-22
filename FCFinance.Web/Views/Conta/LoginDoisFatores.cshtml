@@ -1,0 +1,33 @@
+@model LoginDoisFatoresViewModel
+@{
+    ViewData["Title"] = "Verificação em duas etapas";
+    Layout = "_AuthLayout";
+}
+
+<main class="auth-solo">
+  <section class="panel auth-card">
+    <div class="tx-title">
+      <span class="tx-title-icon">🔐</span>
+      <div><h1>Verificação em duas etapas</h1><p>Digite o código de 6 números do seu app autenticador</p></div>
+    </div>
+
+    <form asp-action="LoginDoisFatores" method="post" novalidate>
+      <input type="hidden" asp-for="ReturnUrl" />
+      <input type="hidden" asp-for="ManterConectado" />
+      <div asp-validation-summary="All" class="auth-alert"></div>
+
+      <div class="field-group">
+        <label asp-for="Codigo">Código</label>
+        <div class="field"><span class="field-icon">#</span>
+          <input asp-for="Codigo" autocomplete="one-time-code" inputmode="numeric" placeholder="123 456" autofocus></div>
+      </div>
+
+      <label class="check-row"><input asp-for="LembrarEsteNavegador" type="checkbox"><span class="check-box"></span>Não pedir de novo neste navegador
+        <i title="Só marque no seu computador pessoal.">?</i></label>
+      <label class="check-row"><input asp-for="UsarCodigoRecuperacao" type="checkbox"><span class="check-box"></span>Perdi o celular: vou usar um código de recuperação</label>
+
+      <button type="submit" class="btn btn-primary auth-submit">Confirmar&nbsp; →</button>
+    </form>
+    <div class="auth-links"><span></span><a asp-action="Login">Voltar para o login</a></div>
+  </section>
+</main>

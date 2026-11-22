@@ -1,0 +1,24 @@
+@model bool
+@{
+    ViewData["Title"] = Model ? "E-mail confirmado" : "Link inválido";
+    Layout = "_AuthLayout";
+}
+
+<main class="auth-solo">
+  <section class="panel auth-card">
+    @if (Model)
+    {
+      <div class="auth-icon-big">✅</div>
+      <div class="tx-title"><div><h1>E-mail confirmado!</h1></div></div>
+      <p>Sua conta está ativa. Agora é só entrar.</p>
+      <a class="btn btn-primary auth-submit" asp-action="Login">Entrar&nbsp; →</a>
+    }
+    else
+    {
+      <div class="auth-icon-big">⚠️</div>
+      <div class="tx-title"><div><h1>Link inválido ou vencido</h1></div></div>
+      <p>O link de confirmação vale por 3 horas e só pode ser usado uma vez. Peça um novo:</p>
+      <a class="btn btn-primary auth-submit" asp-action="VerifiqueSeuEmail">Pedir novo link</a>
+    }
+  </section>
+</main>

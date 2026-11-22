@@ -1,0 +1,30 @@
+@model string[]
+@{
+    ViewData["Title"] = "Códigos de recuperação";
+}
+
+<header class="topbar">
+  <div>
+    <h1>Códigos de recuperação 🗝️</h1>
+    <p>Guarde estes códigos em um lugar seguro.</p>
+  </div>
+  <div class="top-actions">
+    <partial name="_UserMenu" />
+  </div>
+</header>
+
+<article class="panel tx-form-panel account-narrow">
+  <div class="alert-ok">✓ Verificação em duas etapas ativa.</div>
+  <p>Se você perder o celular, use <b>um</b> destes códigos para entrar (cada código funciona uma vez só).
+     <b>Eles não serão mostrados de novo.</b> Anote, imprima ou guarde num gerenciador de senhas.</p>
+
+  <div class="codes-grid">
+    @foreach (var c in Model) { <code>@c</code> }
+  </div>
+
+  <a class="btn btn-primary" asp-action="MinhaConta">Já guardei os códigos&nbsp; →</a>
+</article>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/transacoes.css" asp-append-version="true" />
+}

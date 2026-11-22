@@ -6,7 +6,10 @@
 (function () {
   const token = document.querySelector('meta[name="fcf-api-token"]')?.content;
   if (!token) return;
-  const API_HOSTS = ["localhost:7148", "localhost:5286"]; // endereços da API (https e http)
+  // Endereço da API: vem da <meta name="fcf-api-url"> (appsettings "Api:BaseUrl"); localhost como reserva.
+  const apiUrl = document.querySelector('meta[name="fcf-api-url"]')?.content;
+  const API_HOSTS = ["localhost:7148", "localhost:5286"];
+  try { if (apiUrl) API_HOSTS.push(new URL(apiUrl, location.href).host); } catch { }
   const isApi = (url) => { try { return API_HOSTS.includes(new URL(url, location.href).host); } catch { return false; } };
 
   const originalFetch = window.fetch.bind(window);

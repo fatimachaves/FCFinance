@@ -23,19 +23,43 @@ namespace FCFinance.Controllers
             _tokens = tokens;
         }
 
-        // POST api/Auth/login  { "login": "admin", "senha": "...", "manterConectado": true }
+        // POST api/Auth/login  { "login": "voce@email.com", "senha": "...", "manterConectado": true, "codigo": "123456" }
+        // "login" aceita e-mail ou usuário. "codigo" só é necessário para quem ativou a verificação em duas etapas:
+        // sem ele, a resposta é 401 com { requerDoisFatores: true } para o app pedir o código.
         [AllowAnonymous]
         [HttpPost("login")]
         [EnableRateLimiting(ApiSecurity.LoginPolicy)] // máx. 10 tentativas por minuto por IP
         public async Task<IActionResult> Login(LoginDTO dto)
         {
-            var user = await _users.FindByNameAsync(dto.Login.Trim());
-            if (user == null) return Unauthorized("Usuário ou senha inválidos.");
+            var login = dto.Login.Trim();
+            var user = login.Contains('@')
+                ? await _users.FindByEmailAsync(login) ?? await _users.FindByNameAsync(login)
+                : await _users.FindByNameAsync(login);
+            if (user == null) return Unauthorized("E-mail/usuário ou senha inválidos.");
 
             // Confere a senha e conta tentativas erradas (bloqueia após 5, igual ao site).
             var result = await _signIn.CheckPasswordSignInAsync(user, dto.Senha, lockoutOnFailure: true);
             if (result.IsLockedOut) return Unauthorized("Muitas tentativas erradas. Aguarde alguns minutos e tente de novo.");
-            if (!result.Succeeded) return Unauthorized("Usuário ou senha inválidos.");
+            // NotAllowed = e-mail não confirmado. Só avisa se a senha estiver certa (senão revelaria que a conta existe).
+            if (result.IsNotAllowed && await _users.CheckPasswordAsync(user, dto.Senha))
+                return Unauthorized("Confirme seu e-mail antes de entrar. Procure o link na sua caixa de entrada.");
+            if (!result.Succeeded) return Unauthorized("E-mail/usuário ou senha inválidos.");
+
+            // Verificação em duas etapas: código do app autenticador ou um código de recuperação.
+            if (await _users.GetTwoFactorEnabledAsync(user))
+            {
+                var codigo = (dto.Codigo ?? "").Replace(" ", "").Replace("-", "");
+                if (codigo.Length == 0)
+                    return Unauthorized(new { requerDoisFatores = true, mensagem = "Digite o código do seu app autenticador." });
+
+                var valido = await _users.VerifyTwoFactorTokenAsync(user, _users.Options.Tokens.AuthenticatorTokenProvider, codigo)
+                             || (await _users.RedeemTwoFactorRecoveryCodeAsync(user, codigo)).Succeeded;
+                if (!valido)
+                {
+                    await _users.AccessFailedAsync(user); // conta como tentativa errada (bloqueio após 5)
+                    return Unauthorized(new { requerDoisFatores = true, mensagem = "Código inválido." });
+                }
+            }
 
             // Todo token precisa do carimbo de segurança (usuários antigos podem não ter um).
             if (string.IsNullOrEmpty(user.SecurityStamp))
