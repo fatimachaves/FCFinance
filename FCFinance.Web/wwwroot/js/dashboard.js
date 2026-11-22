@@ -2,7 +2,8 @@
   FCFinance - Dashboard em HTML/CSS/JS puro.
   Ajuste API_BASE_URL e TYPE_IDS para corresponder à sua API.
 */
-const API_BASE_URL = "https://localhost:7148/api";
+// Endereço da API vem da página (<meta name="fcf-api-url">, configurado em appsettings "Api:BaseUrl").
+const API_BASE_URL = document.querySelector('meta[name="fcf-api-url"]')?.content || "https://localhost:7148/api";
 const ENDPOINTS = {
   values: `${API_BASE_URL}/RegisteredValue`,
   categories: `${API_BASE_URL}/Category`,

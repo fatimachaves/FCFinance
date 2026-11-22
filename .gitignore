@@ -368,3 +368,5 @@ SENHAS-INICIAIS-APAGAR-DEPOIS.txt
 Database/Inserts_Iniciais.sql
 # E-mails gravados em desenvolvimento (podem conter links de acesso)
 emails-dev/
+# Scripts SQL gerados para publicação (gerar de novo com scripts/gerar-sql-migrations.ps1)
+deploy/sql/

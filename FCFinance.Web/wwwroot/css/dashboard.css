@@ -104,3 +104,7 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:"DM Sans",sans-
 .priority-goal .goal-percent{font-weight:700;font-size:14px}
 .priority-goal small{color:#9aa7b6;font-size:12px}
 .priority-goal .empty-state a{color:#43ed98}
+
+/* Menu lateral: botão Sair dentro de um formulário (POST com proteção antifalsificação) */
+.profile form{margin-left:auto}
+.profile #user-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}

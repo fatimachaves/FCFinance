@@ -1,0 +1,17 @@
+# Dependabot: toda semana confere se há versões novas dos pacotes (NuGet) e das ações do GitHub,
+# e abre um pull request com a atualização. Atualizações de segurança chegam o quanto antes.
+version: 2
+updates:
+  - package-ecosystem: "nuget"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    groups:
+      microsoft:
+        patterns: [ "Microsoft.*", "System.*" ]
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"

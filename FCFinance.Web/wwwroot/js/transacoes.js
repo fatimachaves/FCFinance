@@ -2,7 +2,8 @@
   FCFinance - Tela de Transações (abas: Nova Transação, Metas, Categorias, Histórico).
   Ajuste API_BASE_URL, ENDPOINTS e TYPE_IDS para corresponder à sua API.
 */
-const API_BASE_URL = "https://localhost:7148/api";
+// Endereço da API vem da página (<meta name="fcf-api-url">, configurado em appsettings "Api:BaseUrl").
+const API_BASE_URL = document.querySelector('meta[name="fcf-api-url"]')?.content || "https://localhost:7148/api";
 const ENDPOINTS = {
   values: `${API_BASE_URL}/RegisteredValue`, // GET lista | POST cria | PUT/DELETE {id}
   categories: `${API_BASE_URL}/Category`,    // GET lista | POST cria | PUT/DELETE {id}
@@ -123,8 +124,14 @@ function showView(viewId) {
     t.classList.toggle("active", on);
     if (on) history.replaceState(null, "", `${location.pathname}${location.search}#${t.dataset.hash}`);
   });
+  window.dispatchEvent(new Event("fcf:tab")); // avisa o menu lateral para marcar o item certo
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
+// Menu lateral muda só o "#" da página (ex.: #metas -> #historico): troca de aba sem recarregar.
+window.addEventListener("hashchange", () => {
+  const tab = document.querySelector(`.tx-tab[data-hash="${location.hash.slice(1)}"]`);
+  if (tab) showView(tab.dataset.view);
+});
 document.querySelectorAll(".tx-tab").forEach(tab => tab.addEventListener("click", () => showView(tab.dataset.view)));
 document.querySelectorAll("[data-go]").forEach(el => el.addEventListener("click", (e) => { e.preventDefault(); showView(el.dataset.go); }));
 

@@ -26,8 +26,9 @@
 <body>
     <div class="app-shell">
 
-      @*   @* ===== MENU LATERAL (fixo em todas as páginas) ===== 
-        <aside class="sidebar" id="sidebar">
+        @* ===== MENU LATERAL (todas as páginas logadas). No celular vira uma gaveta aberta pelo botão ☰. =====
+           Só entram telas que existem. Os itens de Transações abrem direto a aba certa (#nova, #metas...). *@
+        <aside class="sidebar" id="sidebar" aria-label="Menu">
             <button class="sidebar-toggle" id="sidebar-toggle" type="button"
                     aria-label="Recolher menu" aria-expanded="true" title="Recolher menu">‹</button>
 
@@ -38,37 +39,31 @@
             </a>
 
             <nav class="nav-menu" aria-label="Menu principal">
-                <a class="nav-link @Active("Home")" asp-area="" asp-controller="Home" asp-action="Index"><span class="nav-icon">⌂</span>Dashboard</a>
-                @* Troque href="#" por asp-controller/asp-action conforme criar as controllers 
-                <a class="nav-link" href="#"><span class="nav-icon">⊕</span>Receitas</a>
-                <a class="nav-link" href="#"><span class="nav-icon">⊖</span>Despesas</a>
-                <a class="nav-link" href="#"><span class="nav-icon">▦</span>Contas a Pagar</a>
-                <a class="nav-link" href="#"><span class="nav-icon">◎</span>Metas</a>
-                <a class="nav-link" href="#"><span class="nav-icon">♧</span>Orçamento e Economia</a>
-                <a class="nav-link" href="#"><span class="nav-icon">⌁</span>Investimentos e Patrimônio</a>
-                <a class="nav-link" href="#"><span class="nav-icon">▣</span>Dívidas e Parcelas</a>
-                <a class="nav-link" href="#"><span class="nav-icon">⚙</span>Configurações</a>
+                <a class="nav-link @Active("Home")" asp-controller="Home" asp-action="Index"><span class="nav-icon">⌂</span>Dashboard</a>
+                <a class="nav-link" asp-controller="Transacoes" asp-action="Index" asp-fragment="nova" data-hash="nova"><span class="nav-icon">⊕</span>Nova transação</a>
+                <a class="nav-link" asp-controller="Transacoes" asp-action="Index" asp-fragment="historico" data-hash="historico"><span class="nav-icon">◷</span>Histórico</a>
+                <a class="nav-link" asp-controller="Transacoes" asp-action="Index" asp-fragment="metas" data-hash="metas"><span class="nav-icon">◎</span>Metas</a>
+                <a class="nav-link" asp-controller="Transacoes" asp-action="Index" asp-fragment="categorias" data-hash="categorias"><span class="nav-icon">▥</span>Categorias</a>
+                <a class="nav-link @Active("Conta")" asp-controller="Conta" asp-action="MinhaConta"><span class="nav-icon">⚙</span>Minha conta</a>
+                @if (User.IsInRole(Perfis.Admin))
+                {
+                    <a class="nav-link @Active("Usuarios")" asp-controller="Usuarios" asp-action="Index"><span class="nav-icon">◉</span>Usuários</a>
+                }
             </nav>
 
-            <div class="sidebar-promo">
-                <div class="promo-rocket">♧</div>
-                <strong>Realize seus sonhos!</strong>
-                <p>Planeje, economize e invista no seu futuro.</p>
-                <a href="#">Saiba mais&nbsp; →</a>
-            </div>
-
             <div class="profile">
-                <div class="avatar">F</div>
-                <span id="user-name">Minha conta</span>
-                <button type="button" class="logout" title="Sair">↪</button>
+                <div class="avatar">@(string.IsNullOrEmpty(User.Nome()) ? "?" : User.Nome().Substring(0, 1).ToUpper())</div>
+                <span id="user-name">@User.Nome()</span>
+                <form asp-controller="Conta" asp-action="Sair" method="post" class="inline-form">
+                    <button type="submit" class="logout" title="Sair" aria-label="Sair">↪</button>
+                </form>
             </div>
-        </aside> *@
+        </aside>
 
         @* ===== CONTEÚDO DA PÁGINA ===== *@
         <main class="main-content" role="main">
-            @* Botão do menu no celular: volta junto com o menu lateral (comentado acima).
             <button class="mobile-menu" id="mobile-menu" type="button"
-                    aria-label="Abrir menu" aria-expanded="false">☰</button> *@
+                    aria-label="Abrir menu" aria-expanded="false" aria-controls="sidebar">☰</button>
 
             @* page-body ocupa o espaço livre e empurra o rodapé para o fim da página *@
             <div class="page-body">

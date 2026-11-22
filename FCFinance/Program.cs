@@ -56,6 +56,11 @@ builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(conn
 builder.Services.AddScoped<RegisteredValueService>();
 builder.Services.AddScoped<UserDataService>();
 
+// Hospedagem: proxy (IP real), verificação de saúde em /health e erros sem detalhes técnicos. Ver Services/Producao.cs.
+builder.Services.AddProxyConfiavel(builder.Configuration);
+builder.Services.AddSaude();
+builder.Services.AddProblemDetails();
+
 // Usuário da requisição: usado pelos filtros globais do AppDbContext (cada um só vê os próprios dados).
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUser, HttpCurrentUser>();
@@ -128,8 +133,8 @@ builder.Services.AddApiRateLimits();
 
 // Origens liberadas no CORS vêm do appsettings (seção "Cors:Origins").
 var corsOrigins = builder.Configuration.GetSection("Cors:Origins").Get<string[]>() ?? [];
-if (corsOrigins.Length == 0)
-    throw new InvalidOperationException("Configure Cors:Origins (lista de endereços do site) no appsettings.");
+if (corsOrigins.Length == 0 || corsOrigins.Any(o => o.Contains("TROCAR", StringComparison.OrdinalIgnoreCase)))
+    throw new InvalidOperationException("Configure Cors:Origins com o endereço real do site (appsettings.Production.json ou variável de ambiente Cors__Origins__0).");
 
 builder.Services.AddCors(options =>
 {
@@ -145,6 +150,9 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+// Primeiro de tudo: descobrir o IP real quando há um proxy na frente (hospedagem).
+app.UseProxyConfiavel();
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -153,7 +161,8 @@ if (app.Environment.IsDevelopment())
 }
 else
 {
-    app.UseHsts(); // navegador passa a usar só HTTPS com a API
+    app.UseExceptionHandler(); // erro inesperado vira um 500 padrão, sem mostrar detalhes internos ao cliente
+    app.UseHsts();             // navegador passa a usar só HTTPS com a API
 }
 
 app.UseHttpsRedirection();
@@ -166,5 +175,6 @@ app.UseRateLimiter();    // depois do login: o limite geral é por usuário
 app.UseAuthorization();  // decide se pode acessar
 
 app.MapControllers();
+app.MapHealthChecks("/health").AllowAnonymous();
 
 app.Run();

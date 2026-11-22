@@ -1,6 +1,7 @@
 using System.Threading.RateLimiting;
 using FCFinance.Web.Data;
 using FCFinance.Web.Data.Email;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.AspNetCore.Authorization;
@@ -54,6 +55,16 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.SlidingExpiration = true;
 });
 
+// Chaves de criptografia (cookie de login, formulários, links de e-mail) guardadas no banco,
+// para sobreviverem a reinícios e atualizações do servidor. Ver Data/AuthDbContext.cs.
+builder.Services.AddDataProtection()
+    .SetApplicationName("FCFinance.Web")
+    .PersistKeysToDbContext<AuthDbContext>();
+
+// Hospedagem: proxy (HTTPS/IP reais) e verificação de saúde em /health. Ver Data/Producao.cs.
+builder.Services.AddProxyConfiavel(builder.Configuration);
+builder.Services.AddSaude();
+
 // Confere a cada 1 minuto (em vez de 30) se o login ainda vale: depois de trocar a senha ou
 // excluir o usuário, as outras sessões abertas caem em até 1 minuto.
 builder.Services.Configure<SecurityStampValidatorOptions>(options => options.ValidationInterval = TimeSpan.FromMinutes(1));
@@ -89,6 +100,11 @@ builder.Services.AddSingleton<ApiTokenService>();
 // Chamadas do servidor do site para a API (ex.: criar/excluir usuários). Endereço em "Api:BaseUrl".
 var apiBaseUrl = builder.Configuration["Api:BaseUrl"]
     ?? throw new InvalidOperationException("Configure Api:BaseUrl (endereço da API) no appsettings.");
+
+// Os arquivos de produção vêm com "TROCAR-..." onde falta o endereço real: não deixa publicar assim.
+foreach (var chave in new[] { "Api:BaseUrl", "Email:Remetente" })
+    if (builder.Configuration[chave]?.Contains("TROCAR", StringComparison.OrdinalIgnoreCase) == true)
+        throw new InvalidOperationException($"Configure \"{chave}\" com o valor real (appsettings.Production.json ou variável de ambiente).");
 builder.Services.AddHttpClient<ApiUsuariosClient>(client =>
 {
     client.BaseAddress = new Uri(apiBaseUrl.TrimEnd('/') + "/");
@@ -103,6 +119,9 @@ var app = builder.Build();
 
 // Cria as tabelas do login, os perfis e os usuários padrão (admin / usuario).
 await IdentitySeeder.SeedAsync(app.Services);
+
+// Primeiro de tudo: descobrir o HTTPS e o IP reais quando há um proxy na frente (hospedagem).
+app.UseProxyConfiavel();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -123,6 +142,7 @@ app.UseAuthentication(); // lê o cookie e descobre quem é o usuário
 app.UseAuthorization();  // decide se ele pode ver a página
 
 app.MapStaticAssets();
+app.MapHealthChecks("/health");
 
 app.MapControllerRoute(
     name: "default",

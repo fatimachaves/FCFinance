@@ -1,0 +1,42 @@
+# Integração contínua: a cada push na master (ou pull request), o GitHub compila a solução,
+# roda os testes e procura pacotes NuGet com falhas de segurança conhecidas.
+# O resultado aparece na aba "Actions" do repositório (✓ verde ou ✗ vermelho).
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restaurar pacotes
+        run: dotnet restore FCFinance.slnx
+
+      - name: Compilar
+        run: dotnet build FCFinance.slnx -c Release --no-restore
+
+      - name: Testes
+        run: dotnet test FCFinance.slnx -c Release --no-build
+
+      - name: Pacotes com falhas de segurança conhecidas
+        shell: bash
+        run: |
+          dotnet list FCFinance.slnx package --vulnerable --include-transitive | tee vulneraveis.txt
+          if grep -q "has the following vulnerable packages" vulneraveis.txt; then
+            echo "::error::Há pacotes NuGet com vulnerabilidades conhecidas (veja acima)."
+            exit 1
+          fi
