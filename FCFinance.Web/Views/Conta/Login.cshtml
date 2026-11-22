@@ -1,0 +1,59 @@
+@model LoginViewModel
+@{
+    ViewData["Title"] = "Entrar";
+    Layout = "_AuthLayout";
+}
+
+<main class="auth-shell">
+  <section class="auth-promo" aria-hidden="true">
+    <div class="auth-brand"><span class="brand-mark">↗</span><span>FC<b>Finance</b></span></div>
+    <div>
+      <h2>Seu dinheiro<br>no controle.</h2>
+      <p>Acompanhe receitas, despesas e metas em um só lugar.</p>
+    </div>
+    <ul class="auth-points">
+      <li><i>↑</i>Receitas e despesas organizadas</li>
+      <li><i>◎</i>Metas do mês e do ano</li>
+      <li><i>▥</i>Evolução financeira em gráficos</li>
+    </ul>
+  </section>
+
+  <section class="panel auth-card">
+    <div class="tx-title">
+      <span class="tx-title-icon">⚿</span>
+      <div><h1>Entrar</h1><p>Acesse sua conta para continuar</p></div>
+    </div>
+
+    <form asp-action="Login" method="post" novalidate>
+      <input type="hidden" asp-for="ReturnUrl" />
+      <div asp-validation-summary="ModelOnly" class="auth-alert"></div>
+
+      <div class="field-group">
+        <label asp-for="Login">Usuário</label>
+        <div class="field"><span class="field-icon">◉</span><input asp-for="Login" autocomplete="username" placeholder="Seu usuário" autofocus></div>
+        <span asp-validation-for="Login" class="field-error"></span>
+      </div>
+
+      <div class="field-group">
+        <label asp-for="Senha">Senha</label>
+        <div class="field">
+          <span class="field-icon">⚿</span>
+          <input asp-for="Senha" autocomplete="current-password" placeholder="Sua senha">
+          <button type="button" class="show-pass" data-toggle-pass="Senha" aria-label="Mostrar senha" title="Mostrar senha">👁</button>
+        </div>
+        <span asp-validation-for="Senha" class="field-error"></span>
+      </div>
+
+      <label class="check-row">
+        <input asp-for="ManterConectado" type="checkbox"><span class="check-box"></span>Manter conectado
+        <i title="Seu login continua ativo mesmo fechando o navegador (até 14 dias sem uso). Não marque em computadores compartilhados.">?</i>
+      </label>
+
+      <button type="submit" class="btn btn-primary auth-submit">Entrar&nbsp; →</button>
+    </form>
+  </section>
+</main>
+
+@section Scripts {
+    <script src="~/js/auth.js" asp-append-version="true"></script>
+}

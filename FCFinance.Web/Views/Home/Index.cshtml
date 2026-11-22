@@ -1,0 +1,75 @@
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+  <header class="topbar">
+    <div>
+      <h1>Olá, <span id="greeting-name">@User.Nome()</span>! 👋</h1>
+      <p>Aqui está um resumo das suas finanças.</p>
+    </div>
+    <div class="top-actions">
+      @* Atalhos para a tela de cadastro (Transacoes). asp-fragment gera o "#aba" no final do link. *@
+      <a class="quick-btn income" asp-controller="Transacoes" asp-action="Index" asp-fragment="nova" title="Cadastrar receita">↑ Adicionar Receita</a>
+      <a class="quick-btn expense" asp-controller="Transacoes" asp-action="Index" asp-route-tipo="despesa" asp-fragment="nova" title="Cadastrar despesa">↓ Adicionar Despesa</a>
+      <span class="notification" title="Notificações">♧<i>2</i></span>
+      <label class="period-select">
+        <span>▦</span>
+        <select id="period-filter" aria-label="Período">
+          <option value="6">Últimos 6 meses</option>
+          <option value="3">Últimos 3 meses</option>
+          <option value="12">Últimos 12 meses</option>
+          <option value="all">Todo o período</option>
+        </select>
+      </label>
+      <partial name="_UserMenu" />
+    </div>
+  </header>
+
+  <div id="loading" class="status-message">Carregando suas informações...</div>
+  <div id="error-message" class="status-message error hidden"></div>
+
+  <section class="summary-grid" aria-label="Resumo financeiro">
+    <article class="summary-card income-card">
+      <div class="summary-head"><div class="summary-icon">▣</div><div><span>Receitas</span><strong id="total-income">R$ 0,00</strong></div></div>
+      <div class="summary-foot"><span class="trend positive" id="income-trend">—</span><span>no período selecionado</span><div class="sparkline green"></div></div>
+    </article>
+    <article class="summary-card expense-card">
+      <div class="summary-head"><div class="summary-icon">▤</div><div><span>Despesas</span><strong id="total-expense">R$ 0,00</strong></div></div>
+      <div class="summary-foot"><span class="trend negative" id="expense-trend">—</span><span>no período selecionado</span><div class="sparkline red"></div></div>
+    </article>
+    <article class="summary-card balance-card">
+      <div class="summary-head"><div class="summary-icon">＄</div><div><span>Saldo do Período</span><strong id="total-balance">R$ 0,00</strong></div></div>
+      <div class="summary-foot"><span class="trend positive">●</span><span>receitas menos despesas</span><div class="sparkline green"></div></div>
+    </article>
+    <article class="summary-card goal-card">
+      <div class="summary-head"><div class="summary-icon">◎</div><div><span>Meta Prioritária</span><strong id="priority-goal-name">—</strong></div></div>
+      <div id="priority-goal" class="priority-goal"><p class="empty-state">Carregando...</p></div>
+    </article>
+  </section>
+
+  <section class="middle-grid">
+    <article class="panel evolution-panel">
+      <div class="panel-heading"><h2><span class="heading-icon">▥</span>Evolução Financeira</h2><div class="legend"><span><i class="legend-dot income-dot"></i>Receitas</span><span><i class="legend-dot expense-dot"></i>Despesas</span></div></div>
+      <div class="chart-wrap"><canvas id="evolution-chart" aria-label="Gráfico de receitas e despesas"></canvas></div>
+    </article>
+    <article class="panel category-panel">
+      <div class="panel-heading"><h2><span class="heading-icon">◕</span>Despesas por Categoria</h2><a class="see-all" asp-controller="Transacoes" asp-action="Index" asp-fragment="categorias">Gerenciar&nbsp; →</a></div>
+      <div class="category-content"><div class="donut-wrap"><canvas id="category-chart" aria-label="Gráfico de despesas por categoria"></canvas><div class="donut-center"><strong id="donut-total">R$ 0</strong><span>Total</span></div></div><div id="category-legend" class="category-legend"></div></div>
+    </article>
+  </section>
+
+  <section class="bottom-grid">
+    <article class="panel transactions-panel">
+      <div class="panel-heading"><h2><span class="heading-icon">♟</span>Últimas Transações</h2><a class="see-all" asp-controller="Transacoes" asp-action="Index" asp-fragment="historico">Ver todas&nbsp; →</a></div>
+      <div id="transactions-list" class="transactions-list"><p class="empty-state">Nenhuma transação encontrada.</p></div>
+    </article>
+    <article class="panel goals-panel">
+      <div class="panel-heading"><h2><span class="heading-icon">◎</span>Suas Metas</h2><a class="see-all" asp-controller="Transacoes" asp-action="Index" asp-fragment="metas">Ver todas&nbsp; →</a></div>
+      <div id="goals-list" class="goals-list"><p class="empty-state">As metas serão exibidas aqui quando houver um endpoint de metas na API.</p></div>
+    </article>
+  </section>
+
+
+@section Scripts {
+    <script src="~/js/dashboard.js" asp-append-version="true"></script>
+}

@@ -1,0 +1,150 @@
+﻿
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>FCFinance - Lançamentos</title>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <main class="container">
+
+        <header class="header">
+            <div>
+                <h1>Meus lançamentos</h1>
+                <p>Gerencie suas receitas e despesas.</p>
+            </div>
+        </header>
+
+        <!-- FORMULÁRIO -->
+        <section class="card">
+
+            <h2 id="formTitle">Novo lançamento</h2>
+
+            <form id="registeredValueForm">
+
+                <input type="hidden" id="registeredValueId">
+
+                <div class="form-group">
+                    <label for="name">Descrição</label>
+
+                    <input
+                        type="text"
+                        id="name"
+                        placeholder="Ex: Salário, Mercado, Internet"
+                        required>
+                </div>
+
+                <div class="form-group">
+                    <label for="value">Valor (R$)</label>
+
+                    <input
+                        type="number"
+                        id="value"
+                        placeholder="0,00"
+                        min="0.01"
+                        step="0.01"
+                        required>
+                </div>
+
+                <div class="form-group">
+                    <label for="valueTypeId">Tipo de lançamento</label>
+
+                    <select id="valueTypeId" required>
+                        <option value="">Selecione</option>
+                        <option value="1">Receita</option>
+                        <option value="2">Despesa</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="categoryId">Categoria</label>
+
+                    <select id="categoryId" required>
+                        <option value="">Carregando categorias...</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="createWhen">Data do lançamento</label>
+
+                    <input
+                        type="date"
+                        id="createWhen"
+                        required>
+                </div>
+
+                <div class="buttons">
+
+                    <button type="submit" id="saveButton">
+                        Registrar lançamento
+                    </button>
+
+                    <button
+                        type="button"
+                        id="cancelButton"
+                        class="cancel"
+                        hidden>
+                        Cancelar
+                    </button>
+
+                </div>
+
+            </form>
+
+        </section>
+
+        <!-- LISTAGEM -->
+        <section class="card">
+
+            <div class="table-header">
+                <h2>Lançamentos cadastrados</h2>
+
+                <button
+                    type="button"
+                    class="refresh"
+                    onclick="listRegisteredValues()">
+                    Atualizar lista
+                </button>
+            </div>
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Descrição</th>
+                            <th>Valor</th>
+                            <th>Tipo</th>
+                            <th>Categoria</th>
+                            <th>Data</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="registeredValuesTable">
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            <p id="message"></p>
+
+        </section>
+
+    </main>
+
+    <script src="js/api.js"></script>
+    <script src="js/registered-values.js"></script>
+
+</body>
+</html>

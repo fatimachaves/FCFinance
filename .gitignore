@@ -361,3 +361,8 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+# ---- Arquivos locais (nunca versionar) ----
+SENHAS-INICIAIS-APAGAR-DEPOIS.txt
+.claude/
+# Script antigo, desatualizado (os tipos agora são criados pela migration SeedValueTypes)
+Database/Inserts_Iniciais.sql

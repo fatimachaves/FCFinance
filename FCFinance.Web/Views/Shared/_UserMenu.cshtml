@@ -1,0 +1,25 @@
+@* Menu do usuário logado (canto superior direito). Usado no topo das páginas: <partial name="_UserMenu" /> *@
+@{
+    var nome = User.Nome();
+    var isAdmin = User.IsInRole(Perfis.Admin);
+}
+<details class="user-menu">
+  <summary title="@nome">
+    <span class="user-avatar">@(string.IsNullOrEmpty(nome) ? "?" : nome.Substring(0, 1).ToUpper())</span>
+    <span class="user-name">@nome</span>
+    <span class="user-role @(isAdmin ? "admin" : "")">@(isAdmin ? "Admin" : "Usuário")</span>
+  </summary>
+  <div class="user-drop">
+    <a asp-controller="Home" asp-action="Index">⌂ Dashboard</a>
+    <a asp-controller="Transacoes" asp-action="Index">▤ Cadastros</a>
+    @if (isAdmin)
+    {
+      <a asp-controller="Usuarios" asp-action="Index">◉ Usuários</a>
+    }
+    <a asp-controller="Conta" asp-action="AlterarSenha">⚿ Alterar senha</a>
+    <hr>
+    <form asp-controller="Conta" asp-action="Sair" method="post">
+      <button type="submit" class="logout-btn">↪ Sair</button>
+    </form>
+  </div>
+</details>

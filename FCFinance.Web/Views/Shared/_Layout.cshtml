@@ -1,0 +1,81 @@
+@inject ApiTokenService ApiTokens
+@{
+    var controller = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+    string Active(string name) =>
+        string.Equals(controller, name, StringComparison.OrdinalIgnoreCase) ? "active" : "";
+}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - FCFinance</title>
+    @* Token para o JavaScript chamar a API (ver wwwroot/js/apiAuth.js) *@
+    <meta name="fcf-api-token" content="@ApiTokens.CriarPara(User)" />
+    <script src="~/js/apiAuth.js" asp-append-version="true"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/dashboard.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/auth.css" asp-append-version="true" />
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+<body>
+    <div class="app-shell">
+
+      @*   @* ===== MENU LATERAL (fixo em todas as páginas) ===== 
+        <aside class="sidebar" id="sidebar">
+            <button class="sidebar-toggle" id="sidebar-toggle" type="button"
+                    aria-label="Recolher menu" aria-expanded="true" title="Recolher menu">‹</button>
+
+            <a class="brand" asp-area="" asp-controller="Home" asp-action="Index">
+                <span class="brand-mark">↗</span>
+                <span class="brand-name">FC<span>Finance</span></span>
+                <small>Seu dinheiro<br>no controle</small>
+            </a>
+
+            <nav class="nav-menu" aria-label="Menu principal">
+                <a class="nav-link @Active("Home")" asp-area="" asp-controller="Home" asp-action="Index"><span class="nav-icon">⌂</span>Dashboard</a>
+                @* Troque href="#" por asp-controller/asp-action conforme criar as controllers 
+                <a class="nav-link" href="#"><span class="nav-icon">⊕</span>Receitas</a>
+                <a class="nav-link" href="#"><span class="nav-icon">⊖</span>Despesas</a>
+                <a class="nav-link" href="#"><span class="nav-icon">▦</span>Contas a Pagar</a>
+                <a class="nav-link" href="#"><span class="nav-icon">◎</span>Metas</a>
+                <a class="nav-link" href="#"><span class="nav-icon">♧</span>Orçamento e Economia</a>
+                <a class="nav-link" href="#"><span class="nav-icon">⌁</span>Investimentos e Patrimônio</a>
+                <a class="nav-link" href="#"><span class="nav-icon">▣</span>Dívidas e Parcelas</a>
+                <a class="nav-link" href="#"><span class="nav-icon">⚙</span>Configurações</a>
+            </nav>
+
+            <div class="sidebar-promo">
+                <div class="promo-rocket">♧</div>
+                <strong>Realize seus sonhos!</strong>
+                <p>Planeje, economize e invista no seu futuro.</p>
+                <a href="#">Saiba mais&nbsp; →</a>
+            </div>
+
+            <div class="profile">
+                <div class="avatar">F</div>
+                <span id="user-name">Minha conta</span>
+                <button type="button" class="logout" title="Sair">↪</button>
+            </div>
+        </aside> *@
+
+        @* ===== CONTEÚDO DA PÁGINA ===== *@
+        <main class="main-content" role="main">
+            <button class="mobile-menu" id="mobile-menu" type="button"
+                    aria-label="Abrir menu" aria-expanded="false">☰</button>
+
+            @* page-body ocupa o espaço livre e empurra o rodapé para o fim da página *@
+            <div class="page-body">
+                @RenderBody()
+            </div>
+
+            <footer class="page-footer">&copy; @DateTime.Now.Year FCFinance - Todos os direitos reservados.</footer>
+        </main>
+    </div>
+
+    <script src="~/js/sidebar.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

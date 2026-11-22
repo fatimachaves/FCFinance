@@ -1,0 +1,61 @@
+@model AlterarSenhaViewModel
+@{
+    ViewData["Title"] = "Alterar senha";
+}
+
+<header class="topbar">
+  <div>
+    <h1>Olá, @User.Nome()! 👋</h1>
+    <p>Troque a sua senha de acesso.</p>
+  </div>
+  <div class="top-actions">
+    <a class="quick-btn" asp-controller="Home" asp-action="Index">← Dashboard</a>
+    <partial name="_UserMenu" />
+  </div>
+</header>
+
+<article class="panel tx-form-panel account-narrow">
+  <div class="tx-title">
+    <span class="tx-title-icon">⚿</span>
+    <div><h2>Alterar senha</h2><p>Mínimo de 8 caracteres, com letra maiúscula, minúscula e número</p></div>
+  </div>
+
+  @if (TempData["Sucesso"] is string ok) { <div class="alert-ok">✓ @ok</div> }
+
+  <form asp-action="AlterarSenha" method="post" novalidate>
+    <div asp-validation-summary="ModelOnly" class="auth-alert"></div>
+
+    <div class="field-group">
+      <label asp-for="SenhaAtual">Senha atual <b>*</b></label>
+      <div class="field"><span class="field-icon">⚿</span><input asp-for="SenhaAtual" autocomplete="current-password">
+        <button type="button" class="show-pass" data-toggle-pass="SenhaAtual" aria-label="Mostrar senha" title="Mostrar senha">👁</button></div>
+      <span asp-validation-for="SenhaAtual" class="field-error"></span>
+    </div>
+
+    <div class="form-grid">
+      <div class="field-group">
+        <label asp-for="NovaSenha">Nova senha <b>*</b></label>
+        <div class="field"><span class="field-icon">⚿</span><input asp-for="NovaSenha" autocomplete="new-password">
+          <button type="button" class="show-pass" data-toggle-pass="NovaSenha" aria-label="Mostrar senha" title="Mostrar senha">👁</button></div>
+        <span asp-validation-for="NovaSenha" class="field-error"></span>
+      </div>
+      <div class="field-group">
+        <label asp-for="ConfirmarSenha">Confirmar nova senha <b>*</b></label>
+        <div class="field"><span class="field-icon">⚿</span><input asp-for="ConfirmarSenha" autocomplete="new-password"></div>
+        <span asp-validation-for="ConfirmarSenha" class="field-error"></span>
+      </div>
+    </div>
+
+    <div class="form-actions spaced">
+      <a class="btn btn-outline" asp-controller="Home" asp-action="Index">Cancelar</a>
+      <button type="submit" class="btn btn-primary">✓ Salvar nova senha</button>
+    </div>
+  </form>
+</article>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/transacoes.css" asp-append-version="true" />
+}
+@section Scripts {
+    <script src="~/js/auth.js" asp-append-version="true"></script>
+}

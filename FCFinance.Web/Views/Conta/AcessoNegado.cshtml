@@ -1,0 +1,26 @@
+@{
+    ViewData["Title"] = "Acesso negado";
+}
+
+<header class="topbar">
+  <div>
+    <h1>Olá, @User.Nome()! 👋</h1>
+    <p>Esta página é restrita.</p>
+  </div>
+  <div class="top-actions"><partial name="_UserMenu" /></div>
+</header>
+
+<article class="panel tx-form-panel account-narrow">
+  <div class="tx-title">
+    <span class="tx-title-icon" style="background:linear-gradient(145deg,#ff4b55,#a3202a)">⊘</span>
+    <div><h2>Acesso negado</h2><p>Seu perfil não tem permissão para abrir esta página. Fale com o administrador.</p></div>
+  </div>
+  <div class="form-actions">
+    <a class="btn btn-outline" asp-controller="Transacoes" asp-action="Index">▤ Cadastros</a>
+    <a class="btn btn-primary" asp-controller="Home" asp-action="Index">⌂ Ir para o Dashboard</a>
+  </div>
+</article>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/transacoes.css" asp-append-version="true" />
+}

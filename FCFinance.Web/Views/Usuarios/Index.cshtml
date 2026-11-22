@@ -1,0 +1,97 @@
+@model UsuariosViewModel
+@{
+    ViewData["Title"] = "Usuários";
+    var meuId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+}
+
+<header class="topbar">
+  <div>
+    <h1>Olá, @User.Nome()! 👋</h1>
+    <p>Gerencie quem pode acessar o FCFinance.</p>
+  </div>
+  <div class="top-actions">
+    <a class="quick-btn" asp-controller="Home" asp-action="Index">← Dashboard</a>
+    <partial name="_UserMenu" />
+  </div>
+</header>
+
+@if (TempData["Sucesso"] is string ok) { <div class="alert-ok">✓ @ok</div> }
+@if (TempData["Erro"] is string erro) { <div class="alert-err">@erro</div> }
+
+<section class="account-grid">
+  <article class="panel tx-form-panel">
+    <div class="tx-title">
+      <span class="tx-title-icon">+</span>
+      <div><h2>Novo usuário</h2><p>Crie um acesso para outra pessoa</p></div>
+    </div>
+
+    <form asp-action="Criar" method="post" novalidate>
+      <div asp-validation-summary="ModelOnly" class="auth-alert"></div>
+
+      <div class="type-switch" role="radiogroup" aria-label="Perfil">
+        <label class="type-btn scope perfil-opt"><input type="radio" name="Novo.Admin" value="false" checked="@(!Model.Novo.Admin)"><i>◉</i>Usuário</label>
+        <label class="type-btn scope perfil-opt"><input type="radio" name="Novo.Admin" value="true" checked="@Model.Novo.Admin"><i>★</i>Admin</label>
+      </div>
+
+      <div class="field-group">
+        <label asp-for="Novo.Nome">Nome <b>*</b></label>
+        <div class="field"><span class="field-icon">✎</span><input asp-for="Novo.Nome" placeholder="Nome que aparece em “Olá, ...”"></div>
+        <span asp-validation-for="Novo.Nome" class="field-error"></span>
+      </div>
+      <div class="form-grid">
+        <div class="field-group">
+          <label asp-for="Novo.Login">Login <b>*</b></label>
+          <div class="field"><span class="field-icon">◉</span><input asp-for="Novo.Login" autocomplete="off" placeholder="ex: maria"></div>
+          <span asp-validation-for="Novo.Login" class="field-error"></span>
+        </div>
+        <div class="field-group">
+          <label asp-for="Novo.Senha">Senha inicial <b>*</b></label>
+          <div class="field"><span class="field-icon">⚿</span><input asp-for="Novo.Senha" autocomplete="new-password">
+            <button type="button" class="show-pass" data-toggle-pass="Novo_Senha" aria-label="Mostrar senha" title="Mostrar senha">👁</button></div>
+          <span asp-validation-for="Novo.Senha" class="field-error"></span>
+        </div>
+      </div>
+      <p class="hint">A senha precisa de 8 caracteres, com maiúscula, minúscula e número. Peça para a pessoa trocar no primeiro acesso.</p>
+
+      <div class="form-actions spaced">
+        <button type="reset" class="btn btn-outline">↻ Limpar</button>
+        <button type="submit" class="btn btn-primary">✓ Criar usuário</button>
+      </div>
+    </form>
+  </article>
+
+  <article class="panel">
+    <div class="panel-heading"><h2><span class="heading-icon">◉</span>Usuários</h2><span class="count">@Model.Usuarios.Count</span></div>
+    <div class="item-list">
+      @foreach (var u in Model.Usuarios)
+      {
+        <div class="item-row">
+          <i style="background:@(u.Admin ? "#9650dc" : "#19b86f")">@(string.IsNullOrEmpty(u.Nome) ? "?" : u.Nome.Substring(0, 1).ToUpper())</i>
+          <div class="item-main">
+            <strong>@u.Nome @if (u.Id == meuId) { <span class="tag-done">você</span> }</strong>
+            <small>@u.Login · <span class="user-role @(u.Admin ? "admin" : "")">@(u.Admin ? "Admin" : "Usuário")</span></small>
+          </div>
+          @if (u.Id != meuId)
+          {
+            <form asp-action="Excluir" asp-route-id="@u.Id" method="post" class="inline-form"
+                  onsubmit="return confirm('Excluir o usuário @u.Login? Essa ação não pode ser desfeita.');">
+              <button type="submit" class="icon-btn danger" title="Excluir" aria-label="Excluir @u.Login">✕</button>
+            </form>
+          }
+        </div>
+      }
+    </div>
+  </article>
+</section>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/transacoes.css" asp-append-version="true" />
+    <style>
+      .perfil-opt input{position:absolute;opacity:0;width:0;height:0}
+      .perfil-opt:has(input:checked){background:linear-gradient(180deg,#0f6a3e,#0b4d30);border-color:#18c473;box-shadow:0 0 18px #19d77b44}
+      .perfil-opt:has(input:focus-visible){outline:2px solid #52ee9b;outline-offset:2px}
+    </style>
+}
+@section Scripts {
+    <script src="~/js/auth.js" asp-append-version="true"></script>
+}

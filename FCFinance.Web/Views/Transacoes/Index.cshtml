@@ -1,0 +1,286 @@
+@{
+    ViewData["Title"] = "Nova Transação";
+    var userName = User.Nome(); // nome de quem fez login
+}
+
+<header class="topbar">
+  <div>
+    <h1>Olá, <span id="greeting-name">@userName</span>! 👋</h1>
+    <p>Registre suas movimentações e mantenha suas finanças organizadas.</p>
+  </div>
+  <div class="top-actions">
+    <a class="quick-btn" asp-controller="Home" asp-action="Index" title="Voltar para a tela principal">← Dashboard</a>
+    <span class="notification" title="Notificações">♧<i>2</i></span>
+    <label class="period-select">
+      <span>▦</span>
+      <select id="period-filter" aria-label="Período">
+        <option value="6">Últimos 6 meses</option>
+        <option value="3">Últimos 3 meses</option>
+        <option value="12">Últimos 12 meses</option>
+        <option value="all">Todo o período</option>
+      </select>
+    </label>
+    <partial name="_UserMenu" />
+  </div>
+</header>
+
+<div id="tx-status" class="status-message error hidden"></div>
+
+@* Cada aba mostra uma "view" (bloco) diferente da página. O link pode abrir direto numa aba: /Transacoes#metas *@
+<nav class="tx-tabs" aria-label="Seções">
+  <button type="button" class="tx-tab active" data-view="view-form" data-hash="nova"><span>▤</span>Nova Transação</button>
+  <button type="button" class="tx-tab" data-view="view-goals" data-hash="metas"><span>◎</span>Metas</button>
+  <button type="button" class="tx-tab" data-view="view-categories" data-hash="categorias"><span>▥</span>Categorias</button>
+  <button type="button" class="tx-tab" data-view="view-history" data-hash="historico"><span>◷</span>Histórico</button>
+</nav>
+
+@* ===================== ABA: NOVA TRANSAÇÃO ===================== *@
+<div class="tx-view" id="view-form">
+  <section class="tx-grid">
+    <article class="panel tx-form-panel">
+      <div class="tx-title">
+        <span class="tx-title-icon">+</span>
+        <div><h2 id="tx-form-title">Cadastrar</h2><p id="tx-form-subtitle">Adicione uma nova receita ou despesa</p></div>
+      </div>
+
+      <form id="tx-form" novalidate>
+        <div class="type-switch" role="group" aria-label="Tipo da transação">
+          <button type="button" class="type-btn income active" data-type="income" aria-pressed="true"><i>↑</i>Receita</button>
+          <button type="button" class="type-btn expense" data-type="expense" aria-pressed="false"><i>↓</i>Despesa</button>
+        </div>
+
+        <div class="form-grid">
+          <div class="field-group">
+            <label for="tx-value">Valor <b>*</b></label>
+            <div class="field"><span class="field-icon">＄</span><input id="tx-value" inputmode="numeric" autocomplete="off" placeholder="R$ 0,00"></div>
+            <small class="field-error" data-error-for="tx-value"></small>
+          </div>
+
+          <div class="field-group">
+            <label for="tx-category">Categoria <b>*</b></label>
+            <div class="field"><span class="field-icon">▦</span>
+              <select id="tx-category"><option value="">Carregando...</option></select>
+            </div>
+            <small class="field-error" data-error-for="tx-category"></small>
+          </div>
+
+          <div class="field-group">
+            <label for="tx-date">Data <b>*</b></label>
+            <div class="field"><span class="field-icon">▣</span><input id="tx-date" type="date"></div>
+            <small class="field-error" data-error-for="tx-date"></small>
+          </div>
+
+          <div class="field-group">
+            <label for="tx-description">Descrição <span class="optional">(opcional)</span></label>
+            <div class="field"><span class="field-icon">✎</span><input id="tx-description" maxlength="120" placeholder="Ex: Salário, Mercado..."></div>
+          </div>
+
+          <div class="field-group" id="account-group">
+            <label for="tx-account">Conta <span class="optional">(opcional)</span></label>
+            <div class="field"><span class="field-icon">▭</span>
+              <select id="tx-account"><option value="">Selecione uma conta</option></select>
+            </div>
+          </div>
+        </div>
+
+        <label class="check-row"><input type="checkbox" id="tx-recurring"><span class="check-box"></span>Salvar como recorrente <i title="Repete todo mês">?</i></label>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-outline" id="tx-clear">↻ Limpar</button>
+          <button type="submit" class="btn btn-primary" id="tx-save">✓ Salvar Transação</button>
+        </div>
+        @* Só aparece quando uma transação está sendo editada *@
+        <button type="button" class="btn btn-danger hidden" id="tx-delete">✕ Excluir esta transação</button>
+      </form>
+    </article>
+
+    <div class="tx-side">
+      <article class="panel">
+        <div class="panel-heading">
+          <h2><span class="heading-icon">◎</span>Minhas Metas</h2>
+          <button type="button" class="btn-mini" data-go="view-goals">⊕ Nova Meta</button>
+        </div>
+        <div class="pill-tabs" role="tablist">
+          <button type="button" class="pill active" data-goal-scope="month" role="tab" aria-selected="true">Metas do Mês</button>
+          <button type="button" class="pill" data-goal-scope="year" role="tab" aria-selected="false">Metas do Ano</button>
+        </div>
+        <div id="goal-box" class="goal-box"><p class="empty-state">Carregando metas...</p></div>
+      </article>
+
+      <article class="panel">
+        <div class="panel-heading">
+          <h2><span class="heading-icon">◆</span>Categorias</h2>
+          <button type="button" class="btn-mini" data-go="view-categories">⊕ Nova Categoria</button>
+        </div>
+        <div id="category-chips" class="category-chips"><p class="empty-state">Carregando categorias...</p></div>
+      </article>
+    </div>
+  </section>
+
+  <section class="tx-bottom">
+    <article class="panel">
+      <div class="panel-heading"><h2><span class="heading-icon">◷</span>Últimas Movimentações</h2><a href="#historico" class="see-all" data-go="view-history">Ver todas&nbsp; →</a></div>
+      <div class="table-scroll">
+        <table class="tx-table">
+          <thead><tr><th>Data</th><th>Descrição</th><th>Categoria</th><th>Tipo</th><th class="num">Valor</th><th class="num">Ações</th></tr></thead>
+          <tbody id="tx-rows"><tr><td colspan="6" class="empty-state">Carregando...</td></tr></tbody>
+        </table>
+      </div>
+    </article>
+
+    <article class="promo-banner">
+      <div class="promo-chart">↗</div>
+      <div>
+        <p>Organize suas finanças<br>e conquiste seus objetivos!</p>
+        <a href="#metas" class="btn btn-outline" data-go="view-goals">Definir metas&nbsp; →</a>
+      </div>
+    </article>
+  </section>
+</div>
+
+@* ===================== ABA: METAS ===================== *@
+<div class="tx-view hidden" id="view-goals">
+  <section class="tx-grid">
+    <article class="panel tx-form-panel">
+      <div class="tx-title">
+        <span class="tx-title-icon">◎</span>
+        <div><h2 id="goal-form-title">Nova Meta</h2><p>Defina quanto quer juntar e acompanhe o progresso</p></div>
+      </div>
+
+      <form id="goal-form" novalidate>
+        <div class="type-switch" role="group" aria-label="Tipo da meta">
+          <button type="button" class="type-btn scope active" data-goal-type="month" aria-pressed="true"><i>▦</i>Meta do Mês</button>
+          <button type="button" class="type-btn scope" data-goal-type="year" aria-pressed="false"><i>★</i>Meta do Ano</button>
+        </div>
+
+        <div class="form-grid">
+          <div class="field-group full">
+            <label for="goal-name">Nome da meta <b>*</b></label>
+            <div class="field"><span class="field-icon">✎</span><input id="goal-name" maxlength="100" placeholder="Ex: Reserva de emergência, Viagem..."></div>
+            <small class="field-error" data-error-for="goal-name"></small>
+          </div>
+
+          <div class="field-group">
+            <label for="goal-target">Valor da meta <b>*</b></label>
+            <div class="field"><span class="field-icon">＄</span><input id="goal-target" inputmode="numeric" autocomplete="off" placeholder="R$ 0,00"></div>
+            <small class="field-error" data-error-for="goal-target"></small>
+          </div>
+
+          <div class="field-group">
+            <label for="goal-current">Já economizado <span class="optional">(opcional)</span></label>
+            <div class="field"><span class="field-icon">＄</span><input id="goal-current" inputmode="numeric" autocomplete="off" placeholder="R$ 0,00"></div>
+          </div>
+
+          <div class="field-group">
+            <label for="goal-end">Data limite <span class="optional">(opcional)</span></label>
+            <div class="field"><span class="field-icon">▣</span><input id="goal-end" type="date"></div>
+            <small class="field-error" data-error-for="goal-end"></small>
+          </div>
+        </div>
+
+        <label class="check-row"><input type="checkbox" id="goal-priority"><span class="check-box"></span>Meta prioritária <i title="Aparece no dashboard. Só uma meta pode ser prioritária: ao marcar esta, a anterior deixa de ser.">?</i></label>
+
+        <div class="form-actions spaced">
+          <button type="button" class="btn btn-outline" id="goal-clear">↻ Limpar</button>
+          <button type="submit" class="btn btn-primary" id="goal-save">✓ Salvar Meta</button>
+        </div>
+      </form>
+    </article>
+
+    <article class="panel">
+      <div class="panel-heading"><h2><span class="heading-icon">◎</span>Minhas Metas</h2><span class="count" id="goal-count"></span></div>
+      <div class="pill-tabs three" role="tablist">
+        <button type="button" class="pill active" data-goal-filter="all" role="tab" aria-selected="true">Todas</button>
+        <button type="button" class="pill" data-goal-filter="month" role="tab" aria-selected="false">Do Mês</button>
+        <button type="button" class="pill" data-goal-filter="year" role="tab" aria-selected="false">Do Ano</button>
+      </div>
+      <div id="goal-list" class="item-list"><p class="empty-state">Carregando metas...</p></div>
+    </article>
+  </section>
+</div>
+
+@* ===================== ABA: CATEGORIAS ===================== *@
+<div class="tx-view hidden" id="view-categories">
+  <section class="tx-grid">
+    <article class="panel tx-form-panel">
+      <div class="tx-title">
+        <span class="tx-title-icon">▥</span>
+        <div><h2 id="cat-form-title">Nova Categoria</h2><p>Organize suas receitas e despesas por categoria</p></div>
+      </div>
+
+      <form id="cat-form" novalidate>
+        <div class="type-switch" role="group" aria-label="Tipo da categoria">
+          <button type="button" class="type-btn income active" data-cat-type="income" aria-pressed="true"><i>↑</i>Receita</button>
+          <button type="button" class="type-btn expense" data-cat-type="expense" aria-pressed="false"><i>↓</i>Despesa</button>
+        </div>
+
+        <div class="form-grid">
+          <div class="field-group full">
+            <label for="cat-name">Nome da categoria <b>*</b></label>
+            <div class="field"><span class="field-icon">▦</span><input id="cat-name" maxlength="60" placeholder="Ex: Mercado, Salário, Transporte..."></div>
+            <small class="field-error" data-error-for="cat-name"></small>
+          </div>
+        </div>
+
+        <div class="form-actions spaced">
+          <button type="button" class="btn btn-outline" id="cat-clear">↻ Limpar</button>
+          <button type="submit" class="btn btn-primary" id="cat-save">✓ Salvar Categoria</button>
+        </div>
+      </form>
+    </article>
+
+    <article class="panel">
+      <div class="panel-heading"><h2><span class="heading-icon">◆</span>Minhas Categorias</h2><span class="count" id="cat-count"></span></div>
+      <div class="pill-tabs three" role="tablist">
+        <button type="button" class="pill active" data-cat-filter="all" role="tab" aria-selected="true">Todas</button>
+        <button type="button" class="pill" data-cat-filter="income" role="tab" aria-selected="false">Receitas</button>
+        <button type="button" class="pill" data-cat-filter="expense" role="tab" aria-selected="false">Despesas</button>
+      </div>
+      <div id="cat-list" class="item-list"><p class="empty-state">Carregando categorias...</p></div>
+    </article>
+  </section>
+</div>
+
+@* ===================== ABA: HISTÓRICO ===================== *@
+<div class="tx-view hidden" id="view-history">
+  <section class="summary-cards">
+    <article class="panel summary"><small>Receitas</small><strong class="val-income" id="h-income">R$ 0,00</strong></article>
+    <article class="panel summary"><small>Despesas</small><strong class="val-expense" id="h-expense">R$ 0,00</strong></article>
+    <article class="panel summary"><small>Saldo</small><strong id="h-balance">R$ 0,00</strong></article>
+  </section>
+
+  <article class="panel">
+    <div class="panel-heading"><h2><span class="heading-icon">◷</span>Histórico de Movimentações</h2><span class="count" id="h-count"></span></div>
+
+    <div class="filters">
+      <div class="field"><span class="field-icon">⌕</span><input id="h-search" placeholder="Buscar por descrição..." aria-label="Buscar"></div>
+      <div class="field"><span class="field-icon">⇅</span>
+        <select id="h-type" aria-label="Tipo">
+          <option value="all">Todos os tipos</option>
+          <option value="income">Receitas</option>
+          <option value="expense">Despesas</option>
+        </select>
+      </div>
+      <div class="field"><span class="field-icon">▦</span>
+        <select id="h-category" aria-label="Categoria"><option value="">Todas as categorias</option></select>
+      </div>
+    </div>
+    <p class="hint">O período segue o filtro no topo da página.</p>
+
+    <div class="table-scroll">
+      <table class="tx-table">
+        <thead><tr><th>Data</th><th>Descrição</th><th>Categoria</th><th>Tipo</th><th class="num">Valor</th><th class="num">Ações</th></tr></thead>
+        <tbody id="h-rows"><tr><td colspan="6" class="empty-state">Carregando...</td></tr></tbody>
+      </table>
+    </div>
+  </article>
+</div>
+
+<div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+
+@section Scripts {
+    <script src="~/js/transacoes.js" asp-append-version="true"></script>
+}
+@section Styles {
+    <link rel="stylesheet" href="~/css/transacoes.css" asp-append-version="true" />
+}
